@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, Image, StyleSheet} from 'react-native';
+import {View, Text, Image, StyleSheet, ScrollView} from 'react-native';
 
 /*
     nesting hierarchy is defined as such:
@@ -22,11 +22,9 @@ const styles = StyleSheet.create({
     // viewport
     viewport: {
         width: '100%',
-        flex: 1,
         backgroundColor: '#FFFFFF',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center',
         alignItems: 'center',
         overflow: 'scroll',
     },
@@ -80,8 +78,9 @@ const styles = StyleSheet.create({
     },
     imageWrapper: {
         display: 'flex',
+        flexDirection: 'row',
         width: '90%',
-        height: 180,
+        height: 240,
         marginTop: 5,
         marginBottom: 10,
         borderStyle: 'solid',
@@ -138,29 +137,22 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         fontSize: 20,
     },
-});
-
-const CharacterImage = props => {
-    let imageStyle = {
+    characterImage: {
+        resizeMode: 'center',
         width: '100%',
-        height: undefined,
-        aspectRatio: (235 / 93),
-    };
-
-    return (
-        <Image style={imageStyle} source={props.source}/>
-    );
-};
+        height: '100%',
+    },
+});
 
 const CharacterInfoPage = () => {
     return (
-        <View style={styles.viewport}>
+        <ScrollView contentContainerStyle={styles.viewport}>
             <View style={styles.section}>
                 <View style={styles.nameWrapper}>
                     <Text style={styles.characterNameText}>Character Name</Text>
                 </View>
                 <View style={styles.imageWrapper}>
-                    <CharacterImage height={10} width={10} source={require('../img/rick_and_morty_logo.png')}/>
+                    <Image style={styles.characterImage} source={{uri: 'https://eeweb.engineering.nyu.edu/~yao/EL5123/image/lena_gray.bmp'}}/>
                 </View>
             </View>
 
@@ -229,7 +221,7 @@ const CharacterInfoPage = () => {
                     </View>
                 </View>
             </View>
-        </View>
+        </ScrollView>
     );
 };
 
