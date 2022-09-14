@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {View, Text, Image, TextInput, Button, StyleSheet, Touchable, TouchableOpacity} from 'react-native';
+import {View, Text, Image, TextInput, StyleSheet, TouchableOpacity} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 
 

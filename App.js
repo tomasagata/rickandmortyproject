@@ -15,4 +15,4 @@ import CharacterInfoPage from './src/CharacterInfoPage';
 //         </View>);
 // };
 
-export default MainPage;
+export default CharacterInfoPage;
