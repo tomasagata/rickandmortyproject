@@ -1,12 +1,13 @@
 import React from 'react';
-import {View, Text, Image, TextInput, Button} from 'react-native';
+import {View, Text, Image, TextInput, Button } from 'react-native';
 
 const CharacterInfoPage = () => {
     const [characterInfo, setCharacterInfo] = React.useState('')
     const [episodeInfo, setEpisodeInfo] = React.useState('')
     const [loading, setLoading] = React.useState(false)
     const [url, setUrl] = React.useState('https://rickandmortyapi.com/api/character/578')
-    
+    const [selectedValue, setSelectedValue] = React.useState("java");
+
     React.useEffect(() => { 
         getCharacter(url); 
     }, [])  // los primeros parentesis no hacen nada, donde van las llaves va el código, los corchetes tienen las variables de estado? Funciona como componentDidMount
@@ -45,17 +46,20 @@ const CharacterInfoPage = () => {
             <Image style={{ height: 180, width: 180}}
             source={ {uri:  characterInfo ? characterInfo.image : ''  }}/>
 
-            <Text>Information</Text>
+            <Text>Information:</Text>
             <Text>Status: </Text><Text> { characterInfo ? characterInfo.status : 'No hay personaje cargado' } </Text>
-            <Text>Species</Text><Text> { characterInfo ? characterInfo.species : 'No hay personaje cargado' }</Text>
-            <Text>Type</Text><Text>{ characterInfo ? characterInfo.type : 'No hay personaje cargado' }</Text>
-            <Text>Gender</Text><Text>{ characterInfo ? characterInfo.gender : 'No hay personaje cargado' }</Text>
+            <Text>Species:</Text><Text> { characterInfo ? characterInfo.species : 'No hay personaje cargado' }</Text>
+            <Text>Type:</Text><Text>{ characterInfo ? characterInfo.type : 'No hay personaje cargado' }</Text>
+            <Text>Gender:</Text><Text>{ characterInfo ? characterInfo.gender : 'No hay personaje cargado' }</Text>
 
-            <Text>Origin</Text>
+            <Text>Origin:</Text>
             <Text>Name</Text><Text>{ characterInfo ? characterInfo.origin.name : 'No hay personaje cargado' }</Text>
 
-            <Text>First Seen In</Text>
-            <Text>Episode</Text><Text>{ episodeInfo ? episodeInfo.name : 'No hay personaje cargado' }</Text>
+            <Text>First Seen In:</Text>
+            <Text>Episode</Text><Text>{ episodeInfo ? episodeInfo.name : 'No hay episodio cargado' }</Text>
+
+
+
         </View>
     );
 };
