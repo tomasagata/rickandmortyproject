@@ -2,6 +2,7 @@ import React from 'react';
 import {View, Text, Button} from 'react-native';
 import { useState } from 'react';
 import MainPage from './src/MainPage';
+import ResultsPage from './src/ResultsPage';
 import CharacterInfoPage from './src/CharacterInfoPage';
 
 
@@ -15,4 +16,4 @@ import CharacterInfoPage from './src/CharacterInfoPage';
 //         </View>);
 // };
 
-export default CharacterInfoPage;
+export default ResultsPage;
