@@ -1,6 +1,7 @@
-import { View, Text, StyleSheet, Image, TextInput, Pressable, Alert } from 'react-native';
+import { View, Text, StyleSheet, Image, TextInput, Pressable, Alert, FlatList } from 'react-native';
 import React, {useState} from 'react';
 import { Picker } from '@react-native-picker/picker';
+
 
 const TaggedTextInput = props => {
     return (
@@ -14,6 +15,46 @@ const TaggedTextInput = props => {
                     value={props.value}
                     onChangeText={props.onChangeText}
                 />
+            </View>
+        </View>
+    );
+};
+
+const CharacterCard = props => {
+    if (
+        (props.name === undefined) ||
+        (props.image === undefined)){
+            return ( <TimedOutCard /> );
+    }
+
+    return (
+        <View style={characterCardStyles.characterCardContainer}>
+            <Pressable style={characterCardStyles.characterCardPressable}>
+                <View style={characterCardStyles.characterImageWrapper}>
+                    <Image style={characterCardStyles.characterImage} source={{uri: props.image}}/>
+                </View>
+                <View style={characterCardStyles.characterNameWrapper}>
+                    <Text style={characterCardStyles.characterName}>
+                        {props.name}
+                    </Text>
+                </View>
+            </Pressable>
+        </View>
+    );
+};
+
+const TimedOutCard = () => {
+    return (
+        <View style={characterCardStyles.characterCardContainer}>
+            <View style={characterCardStyles.timedOutViewWrapper}>
+                <View style={characterCardStyles.timedOutImageWrapper}>
+                    <Image style={characterCardStyles.timedOutImage} source={require('../img/timedOutIcon.png')} />
+                </View>
+                <View style={characterCardStyles.timedOutMessageWrapper}>
+                    <Text style={characterCardStyles.timedOutMessage}>
+                        Something went wrong. Go back and retry in a few minutes
+                    </Text>
+                </View>
             </View>
         </View>
     );
@@ -37,6 +78,87 @@ const TaggedPickerInput = props => {
     );
 };
 
+const characterCardStyles = StyleSheet.create({
+    characterCardContainer: {
+        width: '100%',
+        display: 'flex',
+        height: 500,
+        backgroundColor: '#D9D9D9',
+        borderRadius: 15,
+        overflow: 'hidden',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: '5%',
+        borderColor: '#6D6D6D',
+        borderStyle: 'solid',
+        borderWidth: 3,
+    },
+    characterCardPressable: {
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        position: 'relative',
+    },
+    characterImageWrapper: {
+        width: '100%',
+        height: '100%',
+    },
+    characterNameWrapper: {
+        position: 'absolute',
+        bottom: -1,
+        left: 0,
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#000000',
+        opacity: 0.65,
+        height: '15%',
+        width: '100%',
+    },
+    characterImage: {
+        width: '100%',
+        height: '100%',
+        resizeMode: 'cover',
+    },
+    characterName: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'Inder-Regular',
+        fontSize: 25,
+        color: '#FFFFFF',
+    },
+    timedOutViewWrapper: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+    },
+    timedOutImageWrapper: {
+        width: '25%',
+        height: '25%',
+        display: 'flex',
+    },
+    timedOutMessageWrapper: {
+        marginTop: '5%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    timedOutImage: {
+        resizeMode: 'center',
+        width: '100%',
+        height: '100%',
+    },
+    timedOutMessage: {
+        color: '#000000',
+        fontSize: 15,
+        textAlign: 'center',
+    },
+});
 
 const styles = StyleSheet.create({
     viewport: {
@@ -79,7 +201,7 @@ const styles = StyleSheet.create({
         flex: 1,
         width: '100%',
         flexDirection: 'column',
-        justifyContent: 'space-around',
+        alignItems: 'center',
     },
     resultTextWrapper: {
         display: 'flex',
@@ -211,6 +333,16 @@ const styles = StyleSheet.create({
         fontFamily: 'Inder-Regular',
         fontSize: 25,
     },
+    flatList: {
+        display: 'flex',
+        width: '75%',
+    },
+    flatListContent: {
+        display: 'flex',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        width: '100%',
+    },
 });
 
 const alertar = () => Alert.alert(
@@ -225,13 +357,6 @@ const alertar = () => Alert.alert(
       { text: 'OK', onPress: () => console.log('OK Pressed') },
     ]
 );
-
-const CharacterCards = props => {
-    return (
-        <>
-        </>
-    );
-};
 
 const ResultsPage = () => {
     const [species, setSpecies] = useState('');
@@ -317,12 +442,172 @@ const ResultsPage = () => {
         </View>
 
         <View style={styles.resultsSection}>
-            <CharacterCards />
+            <FlatList
+                style={styles.flatList}
+                data={testData}
+                showsHorizontalScrollIndicator={false}
+                showsVerticalScrollIndicator={false}
+                renderItem={({item}) => <CharacterCard name={item.name} image={item.image}/> }
+                keyExtractor={item => item.id} />
         </View>
 
 
     </View>
   );
 };
+
+const testData = [
+    {
+        id: 1,
+        name: 'Rick Sanchez',
+        image: 'https://rickandmortyapi.com/api/character/avatar/1.jpeg',
+    },
+    {
+        id: 2,
+        name: 'Morty Smith',
+        image: 'https://rickandmortyapi.com/api/character/avatar/2.jpeg',
+    },
+    {
+        id: 3,
+        name: 'Summer Smith',
+        image: 'https://rickandmortyapi.com/api/character/avatar/3.jpeg',
+    },
+    {
+        id: 4,
+        name: 'Beth Smith',
+        image: 'https://rickandmortyapi.com/api/character/avatar/4.jpeg',
+    },
+    {
+        id: 5,
+        name: 'Jerry Smith',
+        image: 'https://rickandmortyapi.com/api/character/avatar/5.jpeg',
+    },
+    {
+        id: 6,
+        name: 'Rick Sanchez',
+        image: 'https://rickandmortyapi.com/api/character/avatar/6.jpeg',
+    },
+    {
+        id: 7,
+        name: 'Morty Smith',
+        image: 'https://rickandmortyapi.com/api/character/avatar/7.jpeg',
+    },
+    {
+        id: 8,
+        name: 'Summer Smith',
+        image: 'https://rickandmortyapi.com/api/character/avatar/8.jpeg',
+    },
+    {
+        id: 9,
+        name: 'Beth Smith',
+        image: 'https://rickandmortyapi.com/api/character/avatar/9.jpeg',
+    },
+    {
+        id: 10,
+        name: 'Jerry Smith',
+        image: 'https://rickandmortyapi.com/api/character/avatar/10.jpeg',
+    },
+    {
+        id: 11,
+        name: 'Rick Sanchez',
+        image: 'https://rickandmortyapi.com/api/character/avatar/11.jpeg',
+    },
+    {
+        id: 12,
+        name: 'Morty Smith',
+        image: 'https://rickandmortyapi.com/api/character/avatar/12.jpeg',
+    },
+    {
+        id: 13,
+        name: 'Summer Smith',
+        image: 'https://rickandmortyapi.com/api/character/avatar/13.jpeg',
+    },
+    {
+        id: 14,
+        name: 'Beth Smith',
+        image: 'https://rickandmortyapi.com/api/character/avatar/14.jpeg',
+    },
+    {
+        id: 15,
+        name: 'Jerry Smith',
+        image: 'https://rickandmortyapi.com/api/character/avatar/15.jpeg',
+    },
+    {
+        id: 16,
+        name: 'Rick Sanchez',
+        image: 'https://rickandmortyapi.com/api/character/avatar/16.jpeg',
+    },
+    {
+        id: 17,
+        name: 'Morty Smith',
+        image: 'https://rickandmortyapi.com/api/character/avatar/17.jpeg',
+    },
+    {
+        id: 18,
+        name: 'Summer Smith',
+        image: 'https://rickandmortyapi.com/api/character/avatar/18.jpeg',
+    },
+    {
+        id: 19,
+        name: 'Beth Smith',
+        image: 'https://rickandmortyapi.com/api/character/avatar/19.jpeg',
+    },
+    {
+        id: 20,
+        name: 'Jerry Smith',
+        image: 'https://rickandmortyapi.com/api/character/avatar/20.jpeg',
+    },
+    {
+        id: 21,
+        name: 'Rick Sanchez',
+        image: 'https://rickandmortyapi.com/api/character/avatar/21.jpeg',
+    },
+    {
+        id: 22,
+        name: 'Morty Smith',
+        image: 'https://rickandmortyapi.com/api/character/avatar/22.jpeg',
+    },
+    {
+        id: 23,
+        name: 'Summer Smith',
+        image: 'https://rickandmortyapi.com/api/character/avatar/23.jpeg',
+    },
+    {
+        id: 24,
+        name: 'Beth Smith',
+        image: 'https://rickandmortyapi.com/api/character/avatar/24.jpeg',
+    },
+    {
+        id: 25,
+        name: 'Jerry Smith',
+        image: 'https://rickandmortyapi.com/api/character/avatar/25.jpeg',
+    },
+    {
+        id: 26,
+        name: 'Rick Sanchez',
+        image: 'https://rickandmortyapi.com/api/character/avatar/26.jpeg',
+    },
+    {
+        id: 27,
+        name: 'Morty Smith',
+        image: 'https://rickandmortyapi.com/api/character/avatar/27.jpeg',
+    },
+    {
+        id: 28,
+        name: 'Summer Smith',
+        image: 'https://rickandmortyapi.com/api/character/avatar/28.jpeg',
+    },
+    {
+        id: 29,
+        name: 'Beth Smith',
+        image: 'https://rickandmortyapi.com/api/character/avatar/29.jpeg',
+    },
+    {
+        id: 30,
+        name: 'Jerry Smith',
+        image: 'https://rickandmortyapi.com/api/character/avatar/30.jpeg',
+    },
+  ];
+
 
 export default ResultsPage;
