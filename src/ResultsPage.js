@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, TextInput, Pressable, Alert, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Image, TextInput, Pressable, FlatList, Keyboard } from 'react-native';
 import React, {useState} from 'react';
 import { Picker } from '@react-native-picker/picker';
 
@@ -345,30 +345,44 @@ const styles = StyleSheet.create({
     },
 });
 
-const alertar = () => Alert.alert(
-    'Alert Title',
-    'My Alert Msg',
-    [
-      {
-        text: 'Cancel',
-        onPress: () => console.log('Cancel Pressed'),
-        style: 'cancel',
-      },
-      { text: 'OK', onPress: () => console.log('OK Pressed') },
-    ]
-);
+const ResultsPage = props => {
+    const [species, setSpecies] = useState(props.species);
+    const [type, setType] = useState(props.type);
+    const [name, setName] = useState(props.name);
+    const [status, setStatus] = useState(props.status);
+    const [gender, setGender] = useState(props.gender);
+    const [modalData, setModalData] = useState({
+        characterInfo: {
+            id: 0,
+            name: '',
 
-const ResultsPage = () => {
-    const [species, setSpecies] = useState('');
-    const [type, setType] = useState('');
-    const [name, setName] = useState('');
-    const [status, setStatus] = useState('');
-    const [gender, setGender] = useState('');
+        },
+        style: styles.characterModal,
+        shown: false,
+    });
+    const [filterOptionsStyle, setFilterOptionsStyle] = useState(styles.hiddenFilterOptionsSection);
+
+    const showFilterOptions = () => {
+        setFilterOptionsStyle(styles.shownFilterOptionsSection);
+    };
+
+    const cancelFilter = () => {
+        Keyboard.dismiss();
+        setFilterOptionsStyle(styles.hiddenFilterOptionsSection);
+        setSpecies(props.species);
+        setType(props.type);
+        setName(props.name);
+        setStatus(props.status);
+        setGender(props.gender);
+    };
+
+    const applyFilter = () => {
+        Keyboard.dismiss();
+    };
 
     return (
     <View style={styles.viewport}>
-
-        <View style={styles.hiddenFilterOptionsSection}>
+        <View style={filterOptionsStyle}>
             <View style={styles.formContainer}>
                 <View style={styles.filterFormContainer}>
                     <TaggedTextInput
@@ -412,12 +426,12 @@ const ResultsPage = () => {
                 </View>
 
                 <View style={styles.filterFormButtonsContainer}>
-                    <Pressable style={styles.formButton}>
+                    <Pressable style={styles.formButton} onPress={applyFilter}>
                         <View style={styles.applyButton}>
                             <Text style={styles.buttonText}>Apply</Text>
                         </View>
                     </Pressable>
-                    <Pressable style={styles.formButton}>
+                    <Pressable style={styles.formButton} onPress={cancelFilter}>
                         <View style={styles.cancelButton}>
                             <Text style={styles.buttonText}>Cancel</Text>
                         </View>
@@ -435,7 +449,7 @@ const ResultsPage = () => {
                 <Text style={styles.resultText}>Results</Text>
             </View>
             <View style={styles.filterButtonWrapper}>
-                <Pressable onPress={alertar} style={styles.filterButton}>
+                <Pressable onPress={showFilterOptions} style={styles.filterButton}>
                     <Image style={styles.filterButtonImage} source={require('../img/filter.png')}/>
                 </Pressable>
             </View>
@@ -453,8 +467,10 @@ const ResultsPage = () => {
 
 
     </View>
-  );
+    );
 };
+
+
 
 const testData = [
     {
