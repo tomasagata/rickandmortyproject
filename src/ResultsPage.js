@@ -7,9 +7,11 @@ const ResultsPage = () => {
     const [charactersInfo, setCharactersInfo] = React.useState([{name: 'elo', status: 'jeje', episode: ['https://rickandmortyapi.com/api/episode/1']},{name: 'elo2', status: 'jeje', episode:['https://rickandmortyapi.com/api/episode/1']}])
     const [modalVisible, setModalVisible] = React.useState(false)
     const [aCharacterInfo, setACharacterInfo] = React.useState({})
+    const [offset, setOffset] = React.useState(1);
+ 
 
     React.useEffect(() => { 
-        getCharacters('https://rickandmortyapi.com/api/character'); 
+        getCharacters('https://rickandmortyapi.com/api/character?page=' + offset); 
     }, [])
 
     function getCharacters(uriCharacter){
@@ -19,6 +21,8 @@ const ResultsPage = () => {
           .then (res => res.json()) /** una vez que el servidor responde, la respuesta se convierte en json */
           .then( res => {
             setCharactersInfo(res.results)
+            setOffset(offset + 1)
+            
             setLoading(false)
 
             /**setLocationInfo(res.location)
@@ -32,6 +36,17 @@ const ResultsPage = () => {
         setModalVisible(true)
     }
     
+    function fetchMoreData() {
+        fetch ('https://rickandmortyapi.com/api/character?page=' + offset)
+        .then (res => res.json()) /** una vez que el servidor responde, la respuesta se convierte en json */
+        .then( res => {
+          
+          setCharactersInfo([...charactersInfo, ...res.results]);
+          setOffset(offset + 1)
+          
+          setLoading(false)
+     });
+};
 
     /**function getEpisode(uriEpisode){
         setLoading(true)
@@ -62,6 +77,8 @@ const ResultsPage = () => {
         <View>
             <FlatList
             data={charactersInfo}
+            onEndReachedThreshold={0.1}
+            onEndReached={fetchMoreData}
             ListHeaderComponent={() => 
                 {<Text>No hay personajes cargados</Text>}}
             renderItem = { ( {item} )  => ( 
