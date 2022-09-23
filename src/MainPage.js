@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import {View, Text, Image, TextInput, StyleSheet, TouchableOpacity} from 'react-native';
+import {View, Text, Image, TextInput, StyleSheet, TouchableOpacity, Modal} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
+import ResultsPage from './ResultsPage';
 
 
 const styles = StyleSheet.create({
@@ -113,12 +114,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-});
+}); //* puedo llamar las funciones que quiera como quiera, y despues las uso acorde lo que necesite, con funciones que si existen. Para esa transformacion uso props.
 
 const FormButton = props => {
     return (
-        <TouchableOpacity style={props.style}>
+        <TouchableOpacity style={props.style} onPress={props.onPress}> 
             <Text style={props.textStyle}>{props.text}</Text>
+            
         </TouchableOpacity>
     );
 };
@@ -129,6 +131,12 @@ const MainPage = () => {
     const [name, setName] = useState('');
     const [status, setStatus] = useState('');
     const [gender, setGender] = useState('');
+    const [modalResultsVisible, setModalResultsVisible] = React.useState(false)
+
+    function handleResultsPress (name){
+        console.log(name)
+        setModalResultsVisible(true)
+    }
 
     return (
         <View style={styles.viewport}>
@@ -192,8 +200,30 @@ const MainPage = () => {
             </View>
 
             <View style={styles.buttonSection}>
-                <FormButton style={styles.button} text={'Find them'} textStyle={styles.buttonText}/>
+            
+                
+                <FormButton onPress={() => handleResultsPress(name)} style={styles.button} text={'Find them'} textStyle={styles.buttonText}/>
+
+            
+                
+
+               
             </View>
+            <Modal
+                    animationType="slide"
+                    transparent={false}
+        
+                    visible={modalResultsVisible}
+                    onRequestClose={() => {
+                    setModalResultsVisible(!modalResultsVisible);
+                    }}
+                  >
+          
+                    <ResultsPage 
+                        filterValues={name} >
+
+          </ResultsPage>
+      </Modal>
         </View>
     );
 };

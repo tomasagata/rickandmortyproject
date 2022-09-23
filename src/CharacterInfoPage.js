@@ -151,7 +151,6 @@ const CharacterInfoPage = (props) => {
    /** const [characterInfo, setCharacterInfo] = React.useState('')*/
     const [episodeInfo, setEpisodeInfo] = React.useState('')
     const [loading, setLoading] = React.useState(false)
-    const [url, setUrl] = React.useState('https://rickandmortyapi.com/api/character/577')
     const [selectedValue, setSelectedValue] = React.useState("java");
 
    React.useEffect(() => { 
@@ -159,26 +158,7 @@ const CharacterInfoPage = (props) => {
     }, [])  // los primeros parentesis no hacen nada, donde van las llaves va el código, los corchetes tienen las variables de estado? Funciona como componentDidMount
     //como en la llave va lo que uso en use efect, pongo el getCharacter ahí
     //Si pongo los corchetes afuera del parentesis, me refreshea al instante!!
-   /** function getCharacter(uriCharacter){
-        setLoading(true)
-        
-        fetch (uriCharacter)
-          .then (res => res.json())
-          .then( res => {
-            console.log(res)
-            setCharacterInfo(res)
-            setLoading(false)
-            try{
-                getEpisode(res.episode)
-
-            }catch(e){
-                console.log(uriCharacter)
-                console.log(e)
-            }
-            
-          });
-        };
-*/
+    
     function getEpisode(uriEpisode){
         console.log('me trajo esto: ', uriEpisode)
         setLoading(true)
@@ -192,6 +172,11 @@ const CharacterInfoPage = (props) => {
                 setLoading(false)
             });
     };
+
+    
+    
+
+
     return (
         <ScrollView contentContainerStyle={styles.viewport}>
             <View style={styles.section}>

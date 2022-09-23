@@ -2,12 +2,14 @@ import { View, Text, FlatList, TouchableOpacity, Modal } from 'react-native';
 import React from 'react';
 import CharacterInfoPage from './CharacterInfoPage';
 
-const ResultsPage = () => {
+const ResultsPage = (props) => {
     const [loading, setLoading] = React.useState(false)
     const [charactersInfo, setCharactersInfo] = React.useState([{name: 'elo', status: 'jeje', episode: ['https://rickandmortyapi.com/api/episode/1']},{name: 'elo2', status: 'jeje', episode:['https://rickandmortyapi.com/api/episode/1']}])
     const [modalVisible, setModalVisible] = React.useState(false)
     const [aCharacterInfo, setACharacterInfo] = React.useState({})
     const [offset, setOffset] = React.useState(1);
+    const [filterValues, setFilteredValues] = React.useState({})
+
  
 
     React.useEffect(() => { 
@@ -32,7 +34,6 @@ const ResultsPage = () => {
 
     function handleItemPress(character){
         setACharacterInfo(character)
-        console.log(character)
         setModalVisible(true)
     }
     
@@ -48,22 +49,11 @@ const ResultsPage = () => {
      });
 };
 
-    /**function getEpisode(uriEpisode){
-        setLoading(true)
-        
-        fetch (uriEpisode)
-            .then (res => res.json())
-            .then( res => {
-            setLoading(false)
-            return res
-        });
-        return {}
-    };*/
+    
   return (
     <View>
         <View>
             {/* Vista para las opciones del filtro */}
-            <Text>HOLA</Text>
         </View>
 
         <View>
@@ -110,7 +100,7 @@ const ResultsPage = () => {
           setModalVisible(!modalVisible);
         }}
       >
-          <Text>{"Hello, it's me"}</Text>
+          
           <CharacterInfoPage 
           characterInfo={aCharacterInfo} >
 

@@ -16,4 +16,5 @@ import CharacterInfoPage from './src/CharacterInfoPage';
 //         </View>);
 // };
 
-export default ResultsPage;
+export default MainPage;
+;
