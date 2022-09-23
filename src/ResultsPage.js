@@ -1,6 +1,7 @@
-import { View, Text, StyleSheet, Image, TextInput, Pressable, FlatList, Keyboard } from 'react-native';
+import { View, Text, StyleSheet, Image, TextInput, Pressable, FlatList, Keyboard, TouchableOpacity, Modal } from 'react-native';
 import React, {useState} from 'react';
 import { Picker } from '@react-native-picker/picker';
+import CharacterInfoPage from './CharacterInfoPage';
 
 
 const TaggedTextInput = props => {
@@ -28,8 +29,9 @@ const CharacterCard = props => {
     }
 
     return (
+        
         <View style={characterCardStyles.characterCardContainer}>
-            <Pressable style={characterCardStyles.characterCardPressable}>
+            <Pressable onPress={props.onPress} style={characterCardStyles.characterCardPressable }>
                 <View style={characterCardStyles.characterImageWrapper}>
                     <Image style={characterCardStyles.characterImage} source={{uri: props.image}}/>
                 </View>
@@ -40,6 +42,7 @@ const CharacterCard = props => {
                 </View>
             </Pressable>
         </View>
+        
     );
 };
 
@@ -373,15 +376,72 @@ const ResultsPage = props => {
     const cancelFilter = () => {
         Keyboard.dismiss();
         setFilterOptionsStyle(styles.hiddenFilterOptionsSection);
+        
         setTemporaryFilters(currentFilters);
     };
 
     const applyFilter = () => {
         Keyboard.dismiss();
+        setOffset(1)
+        getCharacters('https://rickandmortyapi.com/api/character/?page=1' + '&name=' + temporaryFilters.name + '&type=' + temporaryFilters.type + '&status=' + temporaryFilters.status + '&species=' + temporaryFilters.species + '&gender' + temporaryFilters.gender); 
+
+        console.log(temporaryFilters)
+        
     };
+
+    const [loading, setLoading] = React.useState(false)
+    const [charactersInfo, setCharactersInfo] = React.useState([{name: 'elo', status: 'jeje', episode: ['https://rickandmortyapi.com/api/episode/1']},{name: 'elo2', status: 'jeje', episode:['https://rickandmortyapi.com/api/episode/1']}])
+    const [modalVisible, setModalVisible] = React.useState(false)
+    const [aCharacterInfo, setACharacterInfo] = React.useState({})
+    const [offset, setOffset] = React.useState(1);
+
+
+ 
+
+    React.useEffect(() => { 
+        getCharacters('https://rickandmortyapi.com/api/character?page=' + offset); 
+    }, [])
+
+    function getCharacters(uriCharacter){
+       
+        setLoading(true)
+        
+        fetch (uriCharacter)
+          .then (res => res.json()) /** una vez que el servidor responde, la respuesta se convierte en json */
+          .then( res => {
+            
+            setCharactersInfo(res.results)
+            setOffset(offset + 1)
+            
+            setLoading(false)
+
+            /**setLocationInfo(res.location)
+            setEpisodeInfo(res.episode)*/
+
+          });
+        };
+
+    function handleItemPress(character){
+        setACharacterInfo(character)
+        setModalVisible(true)
+    }
+    
+    function fetchMoreData() {
+        fetch ('https://rickandmortyapi.com/api/character/?page='+ offset + '&name=' + temporaryFilters.name + '&status=' + temporaryFilters.status + '&species=' + temporaryFilters.species + '&gender' + temporaryFilters.gender)
+        .then (res => res.json()) /** una vez que el servidor responde, la respuesta se convierte en json */
+        .then( res => {
+          
+          setCharactersInfo([...charactersInfo, ...res.results]);
+          setOffset(offset + 1)
+          
+          setLoading(false)
+     });
+};
+
 
 
     return (
+        
     <View style={styles.viewport}>
         <View style={filterOptionsStyle}>
             <View style={styles.formContainer}>
@@ -460,13 +520,36 @@ const ResultsPage = props => {
         <View style={styles.resultsSection}>
             <FlatList
                 style={styles.flatList}
-                data={testData}
+                data={charactersInfo}
+                onEndReachedThreshold={0.1}
+                onEndReached={fetchMoreData}
+                ListHeaderComponent={() => 
+                {<Text>No hay personajes cargados</Text>}}
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
-                renderItem={({item}) => <CharacterCard name={item.name} image={item.image}/> }
-                keyExtractor={item => item.id} />
+                renderItem={({item}) => 
+                
+                <CharacterCard onPress={() => handleItemPress(item)} name={item.name ? item.name.toString() : 'None.'} image={item.image  } /> }
+                
+                />
         </View>
+        <Modal
+        animationType="slide"
+        transparent={false}
+        
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }
+    }
+      >
+          
+          <CharacterInfoPage 
+          characterInfo={aCharacterInfo} >
+              
 
+          </CharacterInfoPage>
+      </Modal>
 
     </View>
     );
@@ -474,158 +557,6 @@ const ResultsPage = props => {
 
 
 
-const testData = [
-    {
-        id: 1,
-        name: 'Rick Sanchez',
-        image: 'https://rickandmortyapi.com/api/character/avatar/1.jpeg',
-    },
-    {
-        id: 2,
-        name: 'Morty Smith',
-        image: 'https://rickandmortyapi.com/api/character/avatar/2.jpeg',
-    },
-    {
-        id: 3,
-        name: 'Summer Smith',
-        image: 'https://rickandmortyapi.com/api/character/avatar/3.jpeg',
-    },
-    {
-        id: 4,
-        name: 'Beth Smith',
-        image: 'https://rickandmortyapi.com/api/character/avatar/4.jpeg',
-    },
-    {
-        id: 5,
-        name: 'Jerry Smith',
-        image: 'https://rickandmortyapi.com/api/character/avatar/5.jpeg',
-    },
-    {
-        id: 6,
-        name: 'Rick Sanchez',
-        image: 'https://rickandmortyapi.com/api/character/avatar/6.jpeg',
-    },
-    {
-        id: 7,
-        name: 'Morty Smith',
-        image: 'https://rickandmortyapi.com/api/character/avatar/7.jpeg',
-    },
-    {
-        id: 8,
-        name: 'Summer Smith',
-        image: 'https://rickandmortyapi.com/api/character/avatar/8.jpeg',
-    },
-    {
-        id: 9,
-        name: 'Beth Smith',
-        image: 'https://rickandmortyapi.com/api/character/avatar/9.jpeg',
-    },
-    {
-        id: 10,
-        name: 'Jerry Smith',
-        image: 'https://rickandmortyapi.com/api/character/avatar/10.jpeg',
-    },
-    {
-        id: 11,
-        name: 'Rick Sanchez',
-        image: 'https://rickandmortyapi.com/api/character/avatar/11.jpeg',
-    },
-    {
-        id: 12,
-        name: 'Morty Smith',
-        image: 'https://rickandmortyapi.com/api/character/avatar/12.jpeg',
-    },
-    {
-        id: 13,
-        name: 'Summer Smith',
-        image: 'https://rickandmortyapi.com/api/character/avatar/13.jpeg',
-    },
-    {
-        id: 14,
-        name: 'Beth Smith',
-        image: 'https://rickandmortyapi.com/api/character/avatar/14.jpeg',
-    },
-    {
-        id: 15,
-        name: 'Jerry Smith',
-        image: 'https://rickandmortyapi.com/api/character/avatar/15.jpeg',
-    },
-    {
-        id: 16,
-        name: 'Rick Sanchez',
-        image: 'https://rickandmortyapi.com/api/character/avatar/16.jpeg',
-    },
-    {
-        id: 17,
-        name: 'Morty Smith',
-        image: 'https://rickandmortyapi.com/api/character/avatar/17.jpeg',
-    },
-    {
-        id: 18,
-        name: 'Summer Smith',
-        image: 'https://rickandmortyapi.com/api/character/avatar/18.jpeg',
-    },
-    {
-        id: 19,
-        name: 'Beth Smith',
-        image: 'https://rickandmortyapi.com/api/character/avatar/19.jpeg',
-    },
-    {
-        id: 20,
-        name: 'Jerry Smith',
-        image: 'https://rickandmortyapi.com/api/character/avatar/20.jpeg',
-    },
-    {
-        id: 21,
-        name: 'Rick Sanchez',
-        image: 'https://rickandmortyapi.com/api/character/avatar/21.jpeg',
-    },
-    {
-        id: 22,
-        name: 'Morty Smith',
-        image: 'https://rickandmortyapi.com/api/character/avatar/22.jpeg',
-    },
-    {
-        id: 23,
-        name: 'Summer Smith',
-        image: 'https://rickandmortyapi.com/api/character/avatar/23.jpeg',
-    },
-    {
-        id: 24,
-        name: 'Beth Smith',
-        image: 'https://rickandmortyapi.com/api/character/avatar/24.jpeg',
-    },
-    {
-        id: 25,
-        name: 'Jerry Smith',
-        image: 'https://rickandmortyapi.com/api/character/avatar/25.jpeg',
-    },
-    {
-        id: 26,
-        name: 'Rick Sanchez',
-        image: 'https://rickandmortyapi.com/api/character/avatar/26.jpeg',
-    },
-    {
-        id: 27,
-        name: 'Morty Smith',
-        image: 'https://rickandmortyapi.com/api/character/avatar/27.jpeg',
-    },
-    {
-        id: 28,
-        name: 'Summer Smith',
-        image: 'https://rickandmortyapi.com/api/character/avatar/28.jpeg',
-    },
-    {
-        id: 29,
-        name: 'Beth Smith',
-        image: 'https://rickandmortyapi.com/api/character/avatar/29.jpeg',
-    },
-    {
-        id: 30,
-        name: 'Jerry Smith',
-        image: 'https://rickandmortyapi.com/api/character/avatar/30.jpeg',
-    },
-  ];
 
 
 export default ResultsPage;

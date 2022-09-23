@@ -144,15 +144,40 @@ const styles = StyleSheet.create({
     },
 });
 
-const CharacterInfoPage = () => {
+const CharacterInfoPage = (props) => {
+    /** const [characterInfo, setCharacterInfo] = React.useState('')*/
+    const [episodeInfo, setEpisodeInfo] = React.useState('')
+    const [loading, setLoading] = React.useState(false)
+    const [selectedValue, setSelectedValue] = React.useState("java");
+
+   React.useEffect(() => { 
+        getEpisode(props.characterInfo.episode[0]); 
+    }, [])  // los primeros parentesis no hacen nada, donde van las llaves va el código, los corchetes tienen las variables de estado? Funciona como componentDidMount
+    //como en la llave va lo que uso en use efect, pongo el getCharacter ahí
+    //Si pongo los corchetes afuera del parentesis, me refreshea al instante!!
+    
+    function getEpisode(uriEpisode){
+        console.log('me trajo esto: ', uriEpisode)
+        setLoading(true)
+        
+        fetch (uriEpisode)
+            .then (res => res.json())
+            .then( res => {
+                
+                console.log('me trajo esto: ', res) //esto deja que en el node vea los capitulos!
+                setEpisodeInfo(res)
+                setLoading(false)
+            });
+    };
+
     return (
         <ScrollView contentContainerStyle={styles.viewport}>
             <View style={styles.section}>
                 <View style={styles.nameWrapper}>
-                    <Text style={styles.characterNameText}>Character Name</Text>
+                    <Text style={styles.characterNameText}>{ props.characterInfo ? props.characterInfo.name.toString() : 'None.' }</Text>
                 </View>
                 <View style={styles.imageWrapper}>
-                    <Image style={styles.characterImage} source={{uri: 'https://eeweb.engineering.nyu.edu/~yao/EL5123/image/lena_gray.bmp'}}/>
+                    <Image style={styles.characterImage} source={props.characterInfo ? {uri: props.characterInfo.image} : require('../img/rick_and_morty_logo.png')  }/>
                 </View>
             </View>
 
@@ -165,7 +190,7 @@ const CharacterInfoPage = () => {
                         <Text style={styles.tagText}>Status</Text>
                     </View>
                     <View style={styles.dataWrapper}>
-                        <Text style={styles.dataText}>Character Status</Text>
+                        <Text style={styles.dataText}>{ props.characterInfo ? props.characterInfo.status.toString() : 'None.' }</Text>
                     </View>
                 </View>
                 <View style={styles.taggedDataContainer}>
@@ -173,7 +198,7 @@ const CharacterInfoPage = () => {
                         <Text style={styles.tagText}>Species</Text>
                     </View>
                     <View style={styles.dataWrapper}>
-                        <Text style={styles.dataText}>Character Species</Text>
+                        <Text style={styles.dataText}>{ props.characterInfo ? props.characterInfo.species.toString() : 'None.' }</Text>
                     </View>
                 </View>
                 <View style={styles.taggedDataContainer}>
@@ -181,7 +206,7 @@ const CharacterInfoPage = () => {
                         <Text style={styles.tagText}>Type</Text>
                     </View>
                     <View style={styles.dataWrapper}>
-                        <Text style={styles.dataText}>Character Type</Text>
+                        <Text style={styles.dataText}>{ props.characterInfo.type ? props.characterInfo.type.toString() : 'None' }</Text>
                     </View>
                 </View>
                 <View style={styles.taggedDataContainerLast}>
@@ -189,7 +214,7 @@ const CharacterInfoPage = () => {
                         <Text style={styles.tagText}>Gender</Text>
                     </View>
                     <View style={styles.dataWrapper}>
-                        <Text style={styles.dataText}>Character Gender</Text>
+                        <Text style={styles.dataText}>{ props.characterInfo ? props.characterInfo.gender.toString() : 'None.' }</Text>
                     </View>
                 </View>
             </View>
@@ -203,7 +228,7 @@ const CharacterInfoPage = () => {
                         <Text style={styles.tagText}>Name</Text>
                     </View>
                     <View style={styles.dataWrapper}>
-                        <Text style={styles.dataText}>Character Origin</Text>
+                        <Text style={styles.dataText}>{ props.characterInfo ? props.characterInfo.origin.name.toString() : 'None'}</Text>
                     </View>
                 </View>
             </View>
@@ -217,7 +242,7 @@ const CharacterInfoPage = () => {
                         <Text style={styles.tagText}>Episode</Text>
                     </View>
                     <View style={styles.dataWrapper}>
-                        <Text style={styles.dataText}>Character Episode</Text>
+                        <Text style={styles.dataText}>{ episodeInfo ? episodeInfo.name.toString() : 'No hay episodio cargado' }</Text>
                     </View>
                 </View>
             </View>
