@@ -346,11 +346,15 @@ const styles = StyleSheet.create({
 });
 
 const ResultsPage = props => {
-    const [species, setSpecies] = useState(props.species);
-    const [type, setType] = useState(props.type);
-    const [name, setName] = useState(props.name);
-    const [status, setStatus] = useState(props.status);
-    const [gender, setGender] = useState(props.gender);
+
+    const [currentFilters, setCurrentFilters] = useState({
+        species: props.species ? props.species : '',
+        type: props.type ? props.type : '',
+        name: props.name ? props.name : '',
+        status: props.status ? props.status : '',
+        gender: props.gender ? props.gender : '',
+    });
+    const [temporaryFilters, setTemporaryFilters] = useState(currentFilters);
     const [modalData, setModalData] = useState({
         characterInfo: {
             id: 0,
@@ -369,44 +373,42 @@ const ResultsPage = props => {
     const cancelFilter = () => {
         Keyboard.dismiss();
         setFilterOptionsStyle(styles.hiddenFilterOptionsSection);
-        setSpecies(props.species);
-        setType(props.type);
-        setName(props.name);
-        setStatus(props.status);
-        setGender(props.gender);
+        setTemporaryFilters(currentFilters);
     };
 
     const applyFilter = () => {
         Keyboard.dismiss();
     };
 
+
     return (
     <View style={styles.viewport}>
         <View style={filterOptionsStyle}>
             <View style={styles.formContainer}>
                 <View style={styles.filterFormContainer}>
+
                     <TaggedTextInput
                         tag={'Species'}
-                        value={species}
-                        onChangeText={text => setSpecies(text)}
+                        value={temporaryFilters.species}
+                        onChangeText={text => setTemporaryFilters({...temporaryFilters, species: text})}
                     />
 
                     <TaggedTextInput
                         tag={'Type'}
-                        value={type}
-                        onChangeText={text => setType(text)}
+                        value={temporaryFilters.type}
+                        onChangeText={text => setTemporaryFilters({...temporaryFilters, type: text})}
                     />
 
                     <TaggedTextInput
                         tag={'Name'}
-                        value={name}
-                        onChangeText={text => setName(text)}
+                        value={temporaryFilters.name}
+                        onChangeText={text => setTemporaryFilters({...temporaryFilters, name: text})}
                     />
 
                     <TaggedPickerInput
                         tag={'Status'}
-                        selectedValue={status}
-                        onValueChange={(itemValue, itemIndex) => setStatus(itemValue)}>
+                        selectedValue={temporaryFilters.status}
+                        onValueChange={text => setTemporaryFilters({...temporaryFilters, status: text})}>
                             <Picker.Item label="Any" value=""/>
                             <Picker.Item label="Dead" value="dead"/>
                             <Picker.Item label="Alive" value="alive"/>
@@ -415,8 +417,8 @@ const ResultsPage = props => {
 
                     <TaggedPickerInput
                         tag={'Gender'}
-                        selectedValue={gender}
-                        onValueChange={(itemValue, itemIndex) => setGender(itemValue)}>
+                        selectedValue={temporaryFilters.gender}
+                        onValueChange={text => setTemporaryFilters({...temporaryFilters, gender: text})}>
                             <Picker.Item label="Any" value=""/>
                             <Picker.Item label="Male" value="male"/>
                             <Picker.Item label="Female" value="female"/>
