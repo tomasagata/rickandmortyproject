@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet, Image, TextInput, Pressable, FlatList, Keyboard, TouchableOpacity, Modal } from 'react-native';
-import React, {useState} from 'react';
+import { View, Text, StyleSheet, Image, TextInput, Pressable, FlatList, Keyboard, Modal } from 'react-native';
+import React, {useRef, useState} from 'react';
 import { Picker } from '@react-native-picker/picker';
 import CharacterInfoPage from './CharacterInfoPage';
 
@@ -29,7 +29,7 @@ const CharacterCard = props => {
     }
 
     return (
-        
+
         <View style={characterCardStyles.characterCardContainer}>
             <Pressable onPress={props.onPress} style={characterCardStyles.characterCardPressable }>
                 <View style={characterCardStyles.characterImageWrapper}>
@@ -42,7 +42,7 @@ const CharacterCard = props => {
                 </View>
             </Pressable>
         </View>
-        
+
     );
 };
 
@@ -254,6 +254,10 @@ const styles = StyleSheet.create({
     flagImageContainer: {
         marginTop: -1,
         width: '100%',
+        height: '10%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     formContainer: {
         display: 'flex',
@@ -263,9 +267,9 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
     },
     flagImage: {
-        width: '100%',
-        height: undefined,
-        aspectRatio: (421.53 / 118.7),
+        width: '110%',
+        height: '100%',
+        resizeMode: 'stretch',
     },
     taggedInputContainer: {
         width: '100%',
@@ -318,7 +322,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 7,
+        padding: '4%',
         elevation: 6,
     },
     cancelButton: {
@@ -329,7 +333,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 7,
+        padding: '4%',
         elevation: 6,
     },
     buttonText: {
@@ -350,24 +354,37 @@ const styles = StyleSheet.create({
 
 const ResultsPage = props => {
 
-    const [currentFilters, setCurrentFilters] = useState({
+    const flatListRef = React.useRef(null);
+    const [currentFilters, setCurrentFilters] = React.useState({
         species: props.species ? props.species : '',
         type: props.type ? props.type : '',
         name: props.name ? props.name : '',
         status: props.status ? props.status : '',
         gender: props.gender ? props.gender : '',
     });
-    const [temporaryFilters, setTemporaryFilters] = useState(currentFilters);
-    const [modalData, setModalData] = useState({
-        characterInfo: {
-            id: 0,
-            name: '',
+    const [temporaryFilters, setTemporaryFilters] = React.useState(currentFilters);
+    // const [modalData, setModalData] = useState({
+    //     characterInfo: {
+    //         id: 0,
+    //         name: '',
 
-        },
-        style: styles.characterModal,
-        shown: false,
-    });
-    const [filterOptionsStyle, setFilterOptionsStyle] = useState(styles.hiddenFilterOptionsSection);
+    //     },
+    //     style: styles.characterModal,
+    //     shown: false,
+    // });
+    const [filterOptionsStyle, setFilterOptionsStyle] = React.useState(styles.hiddenFilterOptionsSection);
+    const [loading, setLoading] = React.useState(false);
+    const [charactersInfo, setCharactersInfo] = React.useState([{name: 'elo', status: 'jeje', episode: ['https://rickandmortyapi.com/api/episode/1']},{name: 'elo2', status: 'jeje', episode:['https://rickandmortyapi.com/api/episode/1']}]);
+    const [modalVisible, setModalVisible] = React.useState(false);
+    const [aCharacterInfo, setACharacterInfo] = React.useState({});
+    const [offset, setOffset] = React.useState(1);
+
+
+
+    React.useEffect(() => {
+        getCharacters('https://rickandmortyapi.com/api/character?page=' + offset);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const showFilterOptions = () => {
         setFilterOptionsStyle(styles.shownFilterOptionsSection);
@@ -376,72 +393,102 @@ const ResultsPage = props => {
     const cancelFilter = () => {
         Keyboard.dismiss();
         setFilterOptionsStyle(styles.hiddenFilterOptionsSection);
-        
+
         setTemporaryFilters(currentFilters);
     };
 
     const applyFilter = () => {
-        Keyboard.dismiss();
-        setOffset(1)
-        getCharacters('https://rickandmortyapi.com/api/character/?page=1' + '&name=' + temporaryFilters.name + '&type=' + temporaryFilters.type + '&status=' + temporaryFilters.status + '&species=' + temporaryFilters.species + '&gender' + temporaryFilters.gender); 
+        setOffset(1);
 
-        console.log(temporaryFilters)
-        
+        getCharacters(
+            'https://rickandmortyapi.com/api/character/?page=1' +
+            '&name=' + temporaryFilters.name +
+            '&type=' + temporaryFilters.type +
+            '&status=' + temporaryFilters.status +
+            '&species=' + temporaryFilters.species +
+            '&gender' + temporaryFilters.gender
+        );
+        Keyboard.dismiss();
+        setCurrentFilters(temporaryFilters);
+        console.log(temporaryFilters);
     };
 
-    const [loading, setLoading] = React.useState(false)
-    const [charactersInfo, setCharactersInfo] = React.useState([{name: 'elo', status: 'jeje', episode: ['https://rickandmortyapi.com/api/episode/1']},{name: 'elo2', status: 'jeje', episode:['https://rickandmortyapi.com/api/episode/1']}])
-    const [modalVisible, setModalVisible] = React.useState(false)
-    const [aCharacterInfo, setACharacterInfo] = React.useState({})
-    const [offset, setOffset] = React.useState(1);
+    const getCharacters = (uriCharacter) => {
 
+        setLoading(true);
 
- 
+        fetch(uriCharacter)
+        .then(res => res.json()) /** una vez que el servidor responde, la respuesta se convierte en json */
+        .then(res => {
+            // Preguntar si la query tiene resultados previene que se añadan datos invalidos
+            // al flatlist
+            if (res.results){
+                setCharactersInfo(res.results);
+                setOffset(offset + 1);
+            }
 
-    React.useEffect(() => { 
-        getCharacters('https://rickandmortyapi.com/api/character?page=' + offset); 
-    }, [])
-
-    function getCharacters(uriCharacter){
-       
-        setLoading(true)
-        
-        fetch (uriCharacter)
-          .then (res => res.json()) /** una vez que el servidor responde, la respuesta se convierte en json */
-          .then( res => {
-            
-            setCharactersInfo(res.results)
-            setOffset(offset + 1)
-            
-            setLoading(false)
+            setLoading(false);
 
             /**setLocationInfo(res.location)
             setEpisodeInfo(res.episode)*/
 
-          });
-        };
+        })
+        .catch(function(error) {
+            console.log('There has been a problem with your fetch operation: ' + error.message);
+        });
 
-    function handleItemPress(character){
-        setACharacterInfo(character)
-        setModalVisible(true)
-    }
-    
-    function fetchMoreData() {
-        fetch ('https://rickandmortyapi.com/api/character/?page='+ offset + '&name=' + temporaryFilters.name + '&status=' + temporaryFilters.status + '&species=' + temporaryFilters.species + '&gender' + temporaryFilters.gender)
-        .then (res => res.json()) /** una vez que el servidor responde, la respuesta se convierte en json */
-        .then( res => {
-          
-          setCharactersInfo([...charactersInfo, ...res.results]);
-          setOffset(offset + 1)
-          
-          setLoading(false)
-     });
-};
+        if (flatListRef.current){
+            flatListRef.current.scrollToIndex({index: 0});
+        }
+    };
+
+    const handleItemPress = (character) => {
+        setACharacterInfo(character);
+        setModalVisible(true);
+    };
+
+    const fetchMoreData = () => {
+        fetch(
+            'https://rickandmortyapi.com/api/character/?' +
+            'page=' + offset +
+            '&name=' + currentFilters.name +
+            '&status=' + currentFilters.status +
+            '&species=' + currentFilters.species +
+            '&gender' + currentFilters.gender)
+        .then(res => res.json()) /** una vez que el servidor responde, la respuesta se convierte en json */
+        .then(res => {
+            // Preguntar si la query tiene resultados previene que se añadan datos invalidos
+            // al flatlist
+            if (res.results) {
+                setCharactersInfo([...charactersInfo, ...res.results]);
+                setOffset(offset + 1);
+            }
+
+            setLoading(false);
+        })
+        .catch(function(error) {
+            console.log('There has been a problem with your fetch operation: ' + error.message);
+        });
+    };
+
+    // Siguiendo las recomendaciones de reactnative.dev/docs,
+    // renderItem de la flatList no debería tener una función anonima
+    // puesto que se crea una nueva para cada elemento. En cambio,
+    // renderItem debería llamar a una función común, en este caso nuestra
+    // renderCharacterCard que recibe un item y devuelve el JSX
+    const renderCharacterCard = ({item}) => {
+        return (
+        <CharacterCard
+            onPress={() => handleItemPress(item)}
+            name={item.name ? item.name.toString() : 'None.'}
+            image={item.image}
+        />);
+    };
 
 
 
     return (
-        
+
     <View style={styles.viewport}>
         <View style={filterOptionsStyle}>
             <View style={styles.formContainer}>
@@ -519,37 +566,26 @@ const ResultsPage = props => {
 
         <View style={styles.resultsSection}>
             <FlatList
+                ref={flatListRef}
                 style={styles.flatList}
                 data={charactersInfo}
                 onEndReachedThreshold={0.1}
                 onEndReached={fetchMoreData}
-                ListHeaderComponent={() => 
-                {<Text>No hay personajes cargados</Text>}}
+                ListHeaderComponent={() =>
+                {<Text>No hay personajes cargados</Text>;}}
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
-                renderItem={({item}) => 
-                
-                <CharacterCard onPress={() => handleItemPress(item)} name={item.name ? item.name.toString() : 'None.'} image={item.image  } /> }
-                
-                />
+                renderItem={renderCharacterCard}
+                refreshing={loading}
+            />
         </View>
         <Modal
         animationType="slide"
         transparent={false}
-        
         visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }
-    }
-      >
-          
-          <CharacterInfoPage 
-          characterInfo={aCharacterInfo} >
-              
-
-          </CharacterInfoPage>
-      </Modal>
+        onRequestClose={() => { setModalVisible(!modalVisible); }}>
+            <CharacterInfoPage characterInfo={aCharacterInfo} />
+        </Modal>
 
     </View>
     );

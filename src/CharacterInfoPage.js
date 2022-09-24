@@ -138,37 +138,42 @@ const styles = StyleSheet.create({
         fontSize: 20,
     },
     characterImage: {
-        resizeMode: 'center',
-        width: '100%',
+        resizeMode: 'contain',
         height: '100%',
+        width: '100%',
     },
 });
 
 const CharacterInfoPage = (props) => {
-    /** const [characterInfo, setCharacterInfo] = React.useState('')*/
-    const [episodeInfo, setEpisodeInfo] = React.useState('')
-    const [loading, setLoading] = React.useState(false)
-    const [selectedValue, setSelectedValue] = React.useState("java");
+    // const [characterInfo, setCharacterInfo] = React.useState('')
+    const [episodeInfo, setEpisodeInfo] = React.useState('');
+    // const [loading, setLoading] = React.useState(false);
+    // const [selectedValue, setSelectedValue] = React.useState('java');
 
-   React.useEffect(() => { 
-        getEpisode(props.characterInfo.episode[0]); 
-    }, [])  // los primeros parentesis no hacen nada, donde van las llaves va el código, los corchetes tienen las variables de estado? Funciona como componentDidMount
-    //como en la llave va lo que uso en use efect, pongo el getCharacter ahí
-    //Si pongo los corchetes afuera del parentesis, me refreshea al instante!!
-    
+   React.useEffect(() => {
+        getEpisode(props.characterInfo.episode[0]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    // Los primeros parentesis no hacen nada, donde van las llaves va el código,
+    // los corchetes tienen los elementos que deben cambiar para que el efecto se ejecute
+    // es decir, para que el useEffect se ejecute, lo que esta dentro de los parentesis
+    // debe ser ditinto a la anterior ejecución del useEffect.
+    // Si pongo los corchetes afuera del parentesis, me refreshea al instante!!
+
+
     function getEpisode(uriEpisode){
-        console.log('me trajo esto: ', uriEpisode)
-        setLoading(true)
-        
-        fetch (uriEpisode)
-            .then (res => res.json())
-            .then( res => {
-                
-                console.log('me trajo esto: ', res) //esto deja que en el node vea los capitulos!
-                setEpisodeInfo(res)
-                setLoading(false)
-            });
-    };
+        console.log('me trajo esto: ', uriEpisode);
+        // setLoading(true);
+
+        fetch(uriEpisode)
+        .then(res => res.json())
+        .then(res => {
+
+            console.log('me trajo esto: ', res); //esto deja que en el node vea los capitulos!
+            setEpisodeInfo(res);
+            // setLoading(false);
+        });
+    }
 
     return (
         <ScrollView contentContainerStyle={styles.viewport}>
