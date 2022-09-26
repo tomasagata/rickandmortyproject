@@ -240,6 +240,20 @@ const CharacterInfoPage = (props) => {
 
             <View style={styles.section}>
                 <View style={styles.sectionTitleWrapper}>
+                    <Text style={styles.sectionTitleText}>Last Known Location</Text>
+                </View>
+                <View style={styles.taggedDataContainerLast}>
+                    <View style={styles.tagWrapper}>
+                        <Text style={styles.tagText}>Name</Text>
+                    </View>
+                    <View style={styles.dataWrapper}>
+                        <Text style={styles.dataText}>{ props.characterInfo ? props.characterInfo.location.name.toString() : 'None'}</Text>
+                    </View>
+                </View>
+            </View>
+
+            <View style={styles.section}>
+                <View style={styles.sectionTitleWrapper}>
                     <Text style={styles.sectionTitleText}>First Seen In</Text>
                 </View>
                 <View style={styles.taggedDataContainerLast}>

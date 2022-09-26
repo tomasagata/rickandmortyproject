@@ -1,6 +1,5 @@
 import { View, Text, StyleSheet, Image, TextInput, Pressable, FlatList, Keyboard, Modal } from 'react-native';
 import React from 'react';
-import { Picker } from '@react-native-picker/picker';
 import CharacterInfoPage from './CharacterInfoPage';
 
 const selectButtons = StyleSheet.create({
@@ -123,24 +122,6 @@ const TimedOutCard = () => {
                         Something went wrong. Go back and retry in a few minutes
                     </Text>
                 </View>
-            </View>
-        </View>
-    );
-};
-
-const TaggedPickerInput = props => {
-    return (
-        <View style={styles.taggedInputContainer}>
-            <View style={styles.inputTagContainer}>
-                <Text style={styles.inputTag}>{props.tag}</Text>
-            </View>
-            <View style={styles.inputElementContainer}>
-                <Picker
-                    style={styles.inputElement}
-                    selectedValue={props.selectedValue}
-                    onValueChange={props.onValueChange}>
-                        {props.children}
-                </Picker>
             </View>
         </View>
     );
@@ -623,17 +604,17 @@ const ResultsPage = props => {
                         </View>
                         <View style={selectButtons.inputElementsContainer}>
                             <View style={selectButtons.pressableWrapper}>
-                                <Pressable style={statusButtonsStyle['alive']} onPress={() => {setStatus('alive');}}>
+                                <Pressable style={statusButtonsStyle.alive} onPress={() => {setStatus('alive');}}>
                                     <Text style={selectButtons.pressableLabel}>Alive</Text>
                                 </Pressable>
                             </View>
                             <View style={selectButtons.pressableWrapper}>
-                                <Pressable style={statusButtonsStyle['dead']} onPress={() => {setStatus('dead');}}>
+                                <Pressable style={statusButtonsStyle.dead} onPress={() => {setStatus('dead');}}>
                                     <Text style={selectButtons.pressableLabel}>Dead</Text>
                                 </Pressable>
                             </View>
                             <View style={selectButtons.pressableWrapper}>
-                                <Pressable style={statusButtonsStyle['unknown']} onPress={() => {setStatus('unknown');}}>
+                                <Pressable style={statusButtonsStyle.unknown} onPress={() => {setStatus('unknown');}}>
                                     <Text style={selectButtons.pressableLabel}>Unknown</Text>
                                 </Pressable>
                             </View>
@@ -646,48 +627,27 @@ const ResultsPage = props => {
                         </View>
                         <View style={selectButtons.inputElementsContainer}>
                             <View style={selectButtons.pressableWrapper}>
-                                <Pressable style={genderButtonsStyle['male']} onPress={() => {setGender('male');}}>
+                                <Pressable style={genderButtonsStyle.male} onPress={() => {setGender('male');}}>
                                     <Text style={selectButtons.pressableLabel}>Male</Text>
                                 </Pressable>
                             </View>
                             <View style={selectButtons.pressableWrapper}>
-                                <Pressable style={genderButtonsStyle['female']} onPress={() => {setGender('female');}}>
+                                <Pressable style={genderButtonsStyle.female} onPress={() => {setGender('female');}}>
                                     <Text style={selectButtons.pressableLabel}>Female</Text>
                                 </Pressable>
                             </View>
                             <View style={selectButtons.pressableWrapper}>
-                                <Pressable style={genderButtonsStyle['genderless']} onPress={() => {setGender('genderless');}}>
+                                <Pressable style={genderButtonsStyle.genderless} onPress={() => {setGender('genderless');}}>
                                     <Text style={selectButtons.pressableLabel}>Genderless</Text>
                                 </Pressable>
                             </View>
                             <View style={selectButtons.pressableWrapper}>
-                                <Pressable style={genderButtonsStyle['unknown']} onPress={() => {setGender('unknown');}}>
+                                <Pressable style={genderButtonsStyle.unknown} onPress={() => {setGender('unknown');}}>
                                     <Text style={selectButtons.pressableLabel}>Unknown</Text>
                                 </Pressable>
                             </View>
                         </View>
                     </View>
-
-                    {/* <TaggedPickerInput
-                        tag={'Status'}
-                        selectedValue={temporaryFilters.status}
-                        onValueChange={text => setTemporaryFilters({...temporaryFilters, status: text})}>
-                            <Picker.Item label="Any" value=""/>
-                            <Picker.Item label="Dead" value="dead"/>
-                            <Picker.Item label="Alive" value="alive"/>
-                            <Picker.Item label="Unknown" value="unknown"/>
-                    </TaggedPickerInput>
-
-                    <TaggedPickerInput
-                        tag={'Gender'}
-                        selectedValue={temporaryFilters.gender}
-                        onValueChange={text => setTemporaryFilters({...temporaryFilters, gender: text})}>
-                            <Picker.Item label="Any" value=""/>
-                            <Picker.Item label="Male" value="male"/>
-                            <Picker.Item label="Female" value="female"/>
-                            <Picker.Item label="Genderless" value="genderless"/>
-                            <Picker.Item label="Unknown" value="unknown"/>
-                    </TaggedPickerInput> */}
                 </View>
 
                 <View style={styles.filterFormButtonsContainer}>
