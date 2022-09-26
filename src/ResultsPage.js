@@ -508,10 +508,10 @@ const ResultsPage = props => {
         .then(res => {
             // Preguntar si la query tiene resultados previene que se añadan datos invalidos
             // al flatlist
-            if (res.results){
-                setCharactersInfo(res.results);
-                setOffset(offset + 1);
-            }
+            
+            setCharactersInfo(res.results);
+            setOffset(offset + 1)
+            
 
             setLoading(false);
 
