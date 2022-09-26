@@ -508,10 +508,9 @@ const ResultsPage = props => {
         .then(res => {
             // Preguntar si la query tiene resultados previene que se añadan datos invalidos
             // al flatlist
-            
+
             setCharactersInfo(res.results);
-            setOffset(offset + 1)
-            
+            setOffset(offset + 1);
 
             setLoading(false);
 
@@ -523,7 +522,7 @@ const ResultsPage = props => {
             console.log('There has been a problem with your fetch operation: ' + error.message);
         });
 
-        if (flatListRef.current){
+        if (flatListRef.current && charactersInfo !== undefined){
             flatListRef.current.scrollToIndex({index: 0});
         }
     };
