@@ -700,7 +700,7 @@ const ResultsPage = props => {
         transparent={false}
         visible={modalVisible}
         onRequestClose={() => { setModalVisible(!modalVisible); }}>
-            <CharacterInfoPage characterInfo={aCharacterInfo} />
+            <CharacterInfoPage visibilityCallback={setModalVisible} characterInfo={aCharacterInfo} />
         </Modal>
 
     </View>
