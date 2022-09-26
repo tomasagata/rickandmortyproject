@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     // containers (1st order)
     taggedDataContainer: {
         width: '90%',
-        height: 30,
+        height: 50,
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     },
     taggedDataContainerLast: {
         width: '90%',
-        height: 30,
+        height: 50,
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
