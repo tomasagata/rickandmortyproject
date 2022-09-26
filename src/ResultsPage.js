@@ -1,8 +1,73 @@
 import { View, Text, StyleSheet, Image, TextInput, Pressable, FlatList, Keyboard, Modal } from 'react-native';
-import React, {useRef, useState} from 'react';
+import React from 'react';
 import { Picker } from '@react-native-picker/picker';
 import CharacterInfoPage from './CharacterInfoPage';
 
+const selectButtons = StyleSheet.create({
+    taggedInputContainer: {
+        width: '100%',
+        flex: 12.5,
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-around',
+    },
+    inputTagContainer: {
+        width: '25%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    inputTag: {
+        fontFamily: 'Inder-Regular',
+        color: '#FEFAFA',
+    },
+    inputElementsContainer: {
+        width: '65%',
+        height: '80%',
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+        alignContent: 'center',
+    },
+    pressableWrapper: {
+        display: 'flex',
+        height: '50%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderStyle: 'solid',
+        borderColor: '#9A2E2E',
+        borderWidth: 2,
+        borderRadius: 10,
+        overflow: 'hidden',
+    },
+    unselectedPressable: {
+        display: 'flex',
+        height: '100%',
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#D9D9D9',
+        paddingHorizontal: '3%',
+        paddingVertical: '4%',
+    },
+    selectedPressable: {
+        display: 'flex',
+        height: '100%',
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#44CD7B',
+        paddingHorizontal: '3%',
+        paddingVertical: '4%',
+    },
+    pressableLabel: {
+        fontFamily: 'Inder-Regular',
+        color: '#7D7676',
+    },
+});
 
 const TaggedTextInput = props => {
     return (
@@ -237,11 +302,13 @@ const styles = StyleSheet.create({
         height: '95%',
     },
     filterFormContainer: {
+        height: '75%',
         display: 'flex',
         justifyContent: 'space-evenly',
         alignItems: 'center',
     },
     filterFormButtonsContainer: {
+        height: '20%',
         width: '100%',
         display: 'flex',
         flexDirection: 'row-reverse',
@@ -273,6 +340,7 @@ const styles = StyleSheet.create({
     },
     taggedInputContainer: {
         width: '100%',
+        flex: 10,
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
@@ -363,21 +431,23 @@ const ResultsPage = props => {
         gender: props.gender ? props.gender : '',
     });
     const [temporaryFilters, setTemporaryFilters] = React.useState(currentFilters);
-    // const [modalData, setModalData] = useState({
-    //     characterInfo: {
-    //         id: 0,
-    //         name: '',
-
-    //     },
-    //     style: styles.characterModal,
-    //     shown: false,
-    // });
     const [filterOptionsStyle, setFilterOptionsStyle] = React.useState(styles.hiddenFilterOptionsSection);
     const [loading, setLoading] = React.useState(false);
     const [charactersInfo, setCharactersInfo] = React.useState([{name: 'elo', status: 'jeje', episode: ['https://rickandmortyapi.com/api/episode/1']},{name: 'elo2', status: 'jeje', episode:['https://rickandmortyapi.com/api/episode/1']}]);
     const [modalVisible, setModalVisible] = React.useState(false);
     const [aCharacterInfo, setACharacterInfo] = React.useState({});
     const [offset, setOffset] = React.useState(1);
+    const [statusButtonsStyle, setStatusButtonsStyle] = React.useState({
+        'alive': selectButtons.unselectedPressable,
+        'dead': selectButtons.unselectedPressable,
+        'unknown': selectButtons.unselectedPressable,
+    });
+    const [genderButtonsStyle, setGenderButtonsStyle] = React.useState({
+        'male': selectButtons.unselectedPressable,
+        'female': selectButtons.unselectedPressable,
+        'genderless': selectButtons.unselectedPressable,
+        'unknown': selectButtons.unselectedPressable,
+    });
 
 
 
@@ -385,6 +455,40 @@ const ResultsPage = props => {
         getCharacters('https://rickandmortyapi.com/api/character?page=' + offset);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const setStatus = (value) => {
+        let unSelectedStyle = {
+            'alive': selectButtons.unselectedPressable,
+            'dead': selectButtons.unselectedPressable,
+            'unknown': selectButtons.unselectedPressable,
+        };
+
+        let new_status = (value !== temporaryFilters.status) ? value : '';
+        setTemporaryFilters({...temporaryFilters, status: new_status});
+
+        if (new_status !== ''){
+            unSelectedStyle[new_status] = selectButtons.selectedPressable;
+        }
+        setStatusButtonsStyle(unSelectedStyle);
+    };
+
+    const setGender = (value) => {
+        let unSelectedStyle = {
+            'male': selectButtons.unselectedPressable,
+            'female': selectButtons.unselectedPressable,
+            'genderless': selectButtons.unselectedPressable,
+            'unknown': selectButtons.unselectedPressable,
+        };
+
+        let new_gender = (value !== temporaryFilters.gender) ? value : '';
+        setTemporaryFilters({...temporaryFilters, gender: new_gender});
+
+        if (new_gender !== ''){
+            unSelectedStyle[new_gender] = selectButtons.selectedPressable;
+        }
+        setGenderButtonsStyle(unSelectedStyle);
+    };
+
 
     const showFilterOptions = () => {
         setFilterOptionsStyle(styles.shownFilterOptionsSection);
@@ -406,9 +510,10 @@ const ResultsPage = props => {
             '&type=' + temporaryFilters.type +
             '&status=' + temporaryFilters.status +
             '&species=' + temporaryFilters.species +
-            '&gender' + temporaryFilters.gender
+            '&gender=' + temporaryFilters.gender
         );
         Keyboard.dismiss();
+        setFilterOptionsStyle(styles.hiddenFilterOptionsSection);
         setCurrentFilters(temporaryFilters);
         console.log(temporaryFilters);
     };
@@ -512,7 +617,58 @@ const ResultsPage = props => {
                         onChangeText={text => setTemporaryFilters({...temporaryFilters, name: text})}
                     />
 
-                    <TaggedPickerInput
+                    <View style={selectButtons.taggedInputContainer}>
+                        <View style={selectButtons.inputTagContainer}>
+                            <Text style={selectButtons.inputTag}>Status</Text>
+                        </View>
+                        <View style={selectButtons.inputElementsContainer}>
+                            <View style={selectButtons.pressableWrapper}>
+                                <Pressable style={statusButtonsStyle['alive']} onPress={() => {setStatus('alive');}}>
+                                    <Text style={selectButtons.pressableLabel}>Alive</Text>
+                                </Pressable>
+                            </View>
+                            <View style={selectButtons.pressableWrapper}>
+                                <Pressable style={statusButtonsStyle['dead']} onPress={() => {setStatus('dead');}}>
+                                    <Text style={selectButtons.pressableLabel}>Dead</Text>
+                                </Pressable>
+                            </View>
+                            <View style={selectButtons.pressableWrapper}>
+                                <Pressable style={statusButtonsStyle['unknown']} onPress={() => {setStatus('unknown');}}>
+                                    <Text style={selectButtons.pressableLabel}>Unknown</Text>
+                                </Pressable>
+                            </View>
+                        </View>
+                    </View>
+
+                    <View style={selectButtons.taggedInputContainer}>
+                        <View style={selectButtons.inputTagContainer}>
+                            <Text style={selectButtons.inputTag}>Gender</Text>
+                        </View>
+                        <View style={selectButtons.inputElementsContainer}>
+                            <View style={selectButtons.pressableWrapper}>
+                                <Pressable style={genderButtonsStyle['male']} onPress={() => {setGender('male');}}>
+                                    <Text style={selectButtons.pressableLabel}>Male</Text>
+                                </Pressable>
+                            </View>
+                            <View style={selectButtons.pressableWrapper}>
+                                <Pressable style={genderButtonsStyle['female']} onPress={() => {setGender('female');}}>
+                                    <Text style={selectButtons.pressableLabel}>Female</Text>
+                                </Pressable>
+                            </View>
+                            <View style={selectButtons.pressableWrapper}>
+                                <Pressable style={genderButtonsStyle['genderless']} onPress={() => {setGender('genderless');}}>
+                                    <Text style={selectButtons.pressableLabel}>Genderless</Text>
+                                </Pressable>
+                            </View>
+                            <View style={selectButtons.pressableWrapper}>
+                                <Pressable style={genderButtonsStyle['unknown']} onPress={() => {setGender('unknown');}}>
+                                    <Text style={selectButtons.pressableLabel}>Unknown</Text>
+                                </Pressable>
+                            </View>
+                        </View>
+                    </View>
+
+                    {/* <TaggedPickerInput
                         tag={'Status'}
                         selectedValue={temporaryFilters.status}
                         onValueChange={text => setTemporaryFilters({...temporaryFilters, status: text})}>
@@ -531,7 +687,7 @@ const ResultsPage = props => {
                             <Picker.Item label="Female" value="female"/>
                             <Picker.Item label="Genderless" value="genderless"/>
                             <Picker.Item label="Unknown" value="unknown"/>
-                    </TaggedPickerInput>
+                    </TaggedPickerInput> */}
                 </View>
 
                 <View style={styles.filterFormButtonsContainer}>
