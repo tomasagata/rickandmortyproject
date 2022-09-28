@@ -6,14 +6,4 @@
 import ResultsPage from './src/ResultsPage';
 
 
-// const App = () => {
-//     const [contador, setContador] = useState(0);
-
-//     return (
-//         <View>
-//             <Text>You've pressed this button {contador} times</Text>
-//             <Button onPress={() => setContador(contador + 1)} title="Press Me"/>
-//         </View>);
-// };
-
 export default ResultsPage;

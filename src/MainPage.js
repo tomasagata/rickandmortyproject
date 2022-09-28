@@ -1,3 +1,10 @@
+/*
+Este archivo fue creado con la idea de dar una pagina principal,
+para luego ir navegando por las distintas páginas de forma fluida.
+No obstante, todavia al no haber visto alguna forma de navegar, lo
+dejamos como un WIP.
+*/
+
 import React, { useState } from 'react';
 import {View, Text, Image, TextInput, StyleSheet, TouchableOpacity} from 'react-native';
 
@@ -165,29 +172,6 @@ const MainPage = () => {
                         <TextInput style={styles.textInput} onChangeText={setName} value={name} placeholder="Any"/>
                     </View>
                 </View>
-                {/* <View style={styles.formInputContainer}>
-                    <View style={styles.inputTagContainer}>
-                        <Text style={styles.inputTagText}>Status</Text>
-                    </View>
-                    <Picker style={styles.pickerInputContainer} itemStyle={styles.pickerInput} selectedValue={status} onValueChange={(itemValue) => setStatus(itemValue)}>
-                        <Picker.Item label="Any" value=""/>
-                        <Picker.Item label="Dead" value="dead"/>
-                        <Picker.Item label="Alive" value="alive"/>
-                        <Picker.Item label="Unknown" value="unknown"/>
-                    </Picker>
-                </View>
-                <View style={styles.formInputContainer}>
-                    <View style={styles.inputTagContainer}>
-                        <Text style={styles.inputTagText}>Gender</Text>
-                    </View>
-                    <Picker style={styles.pickerInputContainer} itemStyle={styles.pickerInput} selectedValue={gender} onValueChange={(itemValue) => setGender(itemValue)}>
-                        <Picker.Item label="Any" value=""/>
-                        <Picker.Item label="Male" value="male"/>
-                        <Picker.Item label="Female" value="female"/>
-                        <Picker.Item label="Genderless" value="genderless"/>
-                        <Picker.Item label="Unknown" value="unknown"/>
-                    </Picker>
-                </View> */}
             </View>
 
             <View style={styles.buttonSection}>
