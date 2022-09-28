@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {View, Text, Image, TextInput, StyleSheet, TouchableOpacity} from 'react-native';
-import {Picker} from '@react-native-picker/picker';
 
 
 const styles = StyleSheet.create({
@@ -127,8 +126,8 @@ const MainPage = () => {
     const [species, setSpecies] = useState('');
     const [type, setType] = useState('');
     const [name, setName] = useState('');
-    const [status, setStatus] = useState('');
-    const [gender, setGender] = useState('');
+    // const [status, setStatus] = useState('');
+    // const [gender, setGender] = useState('');
 
     return (
         <View style={styles.viewport}>
@@ -166,7 +165,7 @@ const MainPage = () => {
                         <TextInput style={styles.textInput} onChangeText={setName} value={name} placeholder="Any"/>
                     </View>
                 </View>
-                <View style={styles.formInputContainer}>
+                {/* <View style={styles.formInputContainer}>
                     <View style={styles.inputTagContainer}>
                         <Text style={styles.inputTagText}>Status</Text>
                     </View>
@@ -188,7 +187,7 @@ const MainPage = () => {
                         <Picker.Item label="Genderless" value="genderless"/>
                         <Picker.Item label="Unknown" value="unknown"/>
                     </Picker>
-                </View>
+                </View> */}
             </View>
 
             <View style={styles.buttonSection}>

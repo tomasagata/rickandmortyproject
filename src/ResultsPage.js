@@ -496,7 +496,6 @@ const ResultsPage = props => {
         Keyboard.dismiss();
         setFilterOptionsStyle(styles.hiddenFilterOptionsSection);
         setCurrentFilters(temporaryFilters);
-        console.log(temporaryFilters);
     };
 
     const getCharacters = (uriCharacter) => {
@@ -510,7 +509,7 @@ const ResultsPage = props => {
             // al flatlist
 
             setCharactersInfo(res.results);
-            setOffset(offset + 1);
+            setOffset(2);
 
             setLoading(false);
 
@@ -539,7 +538,7 @@ const ResultsPage = props => {
             '&name=' + currentFilters.name +
             '&status=' + currentFilters.status +
             '&species=' + currentFilters.species +
-            '&gender' + currentFilters.gender)
+            '&gender=' + currentFilters.gender)
         .then(res => res.json()) /** una vez que el servidor responde, la respuesta se convierte en json */
         .then(res => {
             // Preguntar si la query tiene resultados previene que se añadan datos invalidos
