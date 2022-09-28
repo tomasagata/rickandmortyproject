@@ -1,61 +1,301 @@
 import React from 'react';
-import {View, Text, Image, TextInput, Button} from 'react-native';
+import {View, Text, Image, StyleSheet, ScrollView, Pressable} from 'react-native';
 
-const CharacterInfoPage = () => {
-    const [characterInfo, setCharacterInfo] = React.useState('')
-    const [episodeInfo, setEpisodeInfo] = React.useState('')
-    const [loading, setLoading] = React.useState(false)
-    const [url, setUrl] = React.useState('https://rickandmortyapi.com/api/character/578')
-    
-    React.useEffect(() => { 
-        getCharacter(url); 
-    }, [])  // los primeros parentesis no hacen nada, donde van las llaves va el código, los corchetes tienen las variables de estado? Funciona como componentDidMount
-    //como en la llave va lo que uso en use efect, pongo el getCharacter ahí
-    //Si pongo los corchetes afuera del parentesis, me refreshea al instante!!
-    function getCharacter(uriCharacter){
-        setLoading(true)
-        
-        fetch (uriCharacter)
-          .then (res => res.json()) /** una vez que el servidor responde, la respuesta se convierte en json */
-          .then( res => {
-            console.log(res)
-            setCharacterInfo(res)
-            setLoading(false)
-            getEpisode(characterInfo.episode)
-          });
-        };
+/*
+    nesting hierarchy is defined as such:
+
+    viewport {
+        section {
+            container (0 or more){
+                wrapper{
+                    tagType{
+                        ...
+                    }
+                }
+            }
+        }
+    }
+
+*/
+
+const styles = StyleSheet.create({
+    // viewport
+    viewport: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        zIndex: 1,
+    },
+    // sections
+    section: {
+        width: '90%',
+        marginTop: 5,
+        marginBottom: 5,
+        backgroundColor: '#C13A3A',
+        borderStyle: 'solid',
+        borderRadius: 10,
+        borderColor: '#9A2E2E',
+        borderWidth: 3,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+    },
+    // containers (1st order)
+    taggedDataContainer: {
+        width: '90%',
+        height: 50,
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexDirection: 'row',
+        marginTop: 5,
+        marginBottom: 5,
+    },
+    taggedDataContainerLast: {
+        width: '90%',
+        height: 50,
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexDirection: 'row',
+        marginTop: 5,
+        marginBottom: 10,
+    },
+    // wrappers
+    nameWrapper: {
+        display: 'flex',
+        width: '90%',
+        height: 60,
+        borderRadius: 10,
+        backgroundColor: '#9A2E2E',
+        marginTop: 10,
+        marginBottom: 5,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    imageWrapper: {
+        display: 'flex',
+        flexDirection: 'row',
+        width: '90%',
+        height: 240,
+        marginTop: 5,
+        marginBottom: 10,
+        borderStyle: 'solid',
+        borderRadius: 10,
+        borderColor: '#9A2E2E',
+        borderWidth: 3,
+        backgroundColor: '#9A2E2E',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    sectionTitleWrapper: {
+        display: 'flex',
+        width: '90%',
+        height: 40,
+        borderRadius: 10,
+        backgroundColor: '#9A2E2E',
+        marginTop: 10,
+        marginBottom: 5,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    tagWrapper: {
+        display: 'flex',
+        height: '100%',
+        width: '32.5%',
+        borderRadius: 10,
+        backgroundColor: '#9A2E2E',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    dataWrapper: {
+        display: 'flex',
+        width: '62.5%',
+        height: '100%',
+        borderRadius: 10,
+        backgroundColor: '#9A2E2E',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    // text tags
+    dataText: {
+        color: '#FFFFFF',
+        fontSize: 15,
+    },
+    tagText: {
+        color: '#FFFFFF',
+        fontSize: 15,
+    },
+    characterNameText: {
+        color: '#FFFFFF',
+        fontSize: 30,
+    },
+    sectionTitleText: {
+        color: '#FFFFFF',
+        fontSize: 20,
+    },
+    characterImage: {
+        resizeMode: 'contain',
+        height: '100%',
+        width: '100%',
+    },
+    pressable: {
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        height: 50,
+        width: 50,
+        backgroundColor: '#C13A3A',
+        zIndex: 2,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        opacity: 1,
+        borderBottomLeftRadius: 10,
+        borderStyle: 'solid',
+        borderColor: '#9A2E2E',
+        borderWidth: 3,
+    },
+    backButton: {
+        fontSize: 30,
+    },
+    scrollView: {
+        width: '100%',
+        backgroundColor: '#FFFFFF',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        overflow: 'scroll',
+    },
+});
+
+const CharacterInfoPage = (props) => {
+    // const [characterInfo, setCharacterInfo] = React.useState('')
+    const [episodeInfo, setEpisodeInfo] = React.useState('');
+    // const [loading, setLoading] = React.useState(false);
+    // const [selectedValue, setSelectedValue] = React.useState('java');
+
+   React.useEffect(() => {
+        getEpisode(props.characterInfo.episode[0]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    // Los primeros parentesis no hacen nada, donde van las llaves va el código,
+    // los corchetes tienen los elementos que deben cambiar para que el efecto se ejecute
+    // es decir, para que el useEffect se ejecute, lo que esta dentro de los parentesis
+    // debe ser ditinto a la anterior ejecución del useEffect.
+    // Si pongo los corchetes afuera del parentesis, me refreshea al instante!!
+
 
     function getEpisode(uriEpisode){
-        setLoading(true)
-        
-        fetch (uriEpisode)
-            .then (res => res.json()) /** una vez que el servidor responde, la respuesta se convierte en json */
-            .then( res => {
-            console.log(res) //esto deja que en el node vea los capitulos!
-            setEpisodeInfo(res)
-            setLoading(false)
+        //console.log('me trajo esto: ', uriEpisode);
+        // setLoading(true);
+
+        fetch(uriEpisode)
+        .then(res => res.json())
+        .then(res => {
+
+            // console.log('me trajo esto: ', res); //esto deja que en el node vea los capitulos!
+            setEpisodeInfo(res);
+            // setLoading(false);
         });
-    };
+    }
 
-//{ characterInfo ? characterInfo.name : 'No hay personaje cargado' } el signo de preg funciona como un bool. Me pregunta si hay algo dentro de characterInfo
-//o sea es como un if character info. Si es true me pone character name, si es false  imprime que no hay personaje cargado
     return (
-        <View>
-            <Text>Character Name: { characterInfo ? characterInfo.name : 'No hay personaje cargado' }</Text> 
-            <Image style={{ height: 180, width: 180}}
-            source={ {uri:  characterInfo ? characterInfo.image : ''  }}/>
+        <View style={styles.viewport}>
+            <Pressable style={styles.pressable} onPress={() => {props.visibilityCallback(false);}}>
+                <Text style={styles.backButton}>X</Text>
+            </Pressable>
+            <ScrollView contentContainerStyle={styles.scrollView}>
+                <View style={styles.section}>
+                    <View style={styles.nameWrapper}>
+                        <Text style={styles.characterNameText}>{ props.characterInfo ? props.characterInfo.name.toString() : 'None.' }</Text>
+                    </View>
+                    <View style={styles.imageWrapper}>
+                        <Image style={styles.characterImage} source={props.characterInfo ? {uri: props.characterInfo.image} : require('../img/rick_and_morty_logo.png')  }/>
+                    </View>
+                </View>
 
-            <Text>Information</Text>
-            <Text>Status: </Text><Text> { characterInfo ? characterInfo.status : 'No hay personaje cargado' } </Text>
-            <Text>Species</Text><Text> { characterInfo ? characterInfo.species : 'No hay personaje cargado' }</Text>
-            <Text>Type</Text><Text>{ characterInfo ? characterInfo.type : 'No hay personaje cargado' }</Text>
-            <Text>Gender</Text><Text>{ characterInfo ? characterInfo.gender : 'No hay personaje cargado' }</Text>
+                <View style={styles.section}>
+                    <View style={styles.sectionTitleWrapper}>
+                        <Text style={styles.sectionTitleText}>Information</Text>
+                    </View>
+                    <View style={styles.taggedDataContainer}>
+                        <View style={styles.tagWrapper}>
+                            <Text style={styles.tagText}>Status</Text>
+                        </View>
+                        <View style={styles.dataWrapper}>
+                            <Text style={styles.dataText}>{ props.characterInfo ? props.characterInfo.status.toString() : 'None.' }</Text>
+                        </View>
+                    </View>
+                    <View style={styles.taggedDataContainer}>
+                        <View style={styles.tagWrapper}>
+                            <Text style={styles.tagText}>Species</Text>
+                        </View>
+                        <View style={styles.dataWrapper}>
+                            <Text style={styles.dataText}>{ props.characterInfo ? props.characterInfo.species.toString() : 'None.' }</Text>
+                        </View>
+                    </View>
+                    <View style={styles.taggedDataContainer}>
+                        <View style={styles.tagWrapper}>
+                            <Text style={styles.tagText}>Type</Text>
+                        </View>
+                        <View style={styles.dataWrapper}>
+                            <Text style={styles.dataText}>{ props.characterInfo.type ? props.characterInfo.type.toString() : 'None' }</Text>
+                        </View>
+                    </View>
+                    <View style={styles.taggedDataContainerLast}>
+                        <View style={styles.tagWrapper}>
+                            <Text style={styles.tagText}>Gender</Text>
+                        </View>
+                        <View style={styles.dataWrapper}>
+                            <Text style={styles.dataText}>{ props.characterInfo ? props.characterInfo.gender.toString() : 'None.' }</Text>
+                        </View>
+                    </View>
+                </View>
 
-            <Text>Origin</Text>
-            <Text>Name</Text><Text>{ characterInfo ? characterInfo.origin.name : 'No hay personaje cargado' }</Text>
+                <View style={styles.section}>
+                    <View style={styles.sectionTitleWrapper}>
+                        <Text style={styles.sectionTitleText}>Origin</Text>
+                    </View>
+                    <View style={styles.taggedDataContainerLast}>
+                        <View style={styles.tagWrapper}>
+                            <Text style={styles.tagText}>Name</Text>
+                        </View>
+                        <View style={styles.dataWrapper}>
+                            <Text style={styles.dataText}>{ props.characterInfo ? props.characterInfo.origin.name.toString() : 'None'}</Text>
+                        </View>
+                    </View>
+                </View>
 
-            <Text>First Seen In</Text>
-            <Text>Episode</Text><Text>{ episodeInfo ? episodeInfo.name : 'No hay personaje cargado' }</Text>
+                <View style={styles.section}>
+                    <View style={styles.sectionTitleWrapper}>
+                        <Text style={styles.sectionTitleText}>Last Known Location</Text>
+                    </View>
+                    <View style={styles.taggedDataContainerLast}>
+                        <View style={styles.tagWrapper}>
+                            <Text style={styles.tagText}>Name</Text>
+                        </View>
+                        <View style={styles.dataWrapper}>
+                            <Text style={styles.dataText}>{ props.characterInfo ? props.characterInfo.location.name.toString() : 'None'}</Text>
+                        </View>
+                    </View>
+                </View>
+
+                <View style={styles.section}>
+                    <View style={styles.sectionTitleWrapper}>
+                        <Text style={styles.sectionTitleText}>First Seen In</Text>
+                    </View>
+                    <View style={styles.taggedDataContainerLast}>
+                        <View style={styles.tagWrapper}>
+                            <Text style={styles.tagText}>Episode</Text>
+                        </View>
+                        <View style={styles.dataWrapper}>
+                            <Text style={styles.dataText}>{ episodeInfo ? episodeInfo.name.toString() : 'No hay episodio cargado' }</Text>
+                        </View>
+                    </View>
+                </View>
+            </ScrollView>
         </View>
     );
 };
