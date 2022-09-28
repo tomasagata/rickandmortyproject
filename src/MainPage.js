@@ -1,8 +1,8 @@
 /*
 Este archivo fue creado con la idea de dar una pagina principal,
 para luego ir navegando por las distintas páginas de forma fluida.
-No obstante, todavia al no haber visto alguna forma de navegar, lo
-dejamos como un WIP.
+No obstante, todavia al no haber terminado el tema de navegación,
+lo dejamos para una próxima entrega
 */
 
 import React, { useState } from 'react';
