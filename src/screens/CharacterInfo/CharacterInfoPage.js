@@ -1,174 +1,9 @@
 import React from 'react';
-import {View, Text, Image, StyleSheet, ScrollView, Pressable} from 'react-native';
+import {View, Text, ScrollView, Pressable} from 'react-native';
+import styles from './styles';
+import Section from '../../components/Sections/Sections';
 
-/*
-    nesting hierarchy is defined as such:
 
-    viewport {
-        section {
-            container (0 or more){
-                wrapper{
-                    tagType{
-                        ...
-                    }
-                }
-            }
-        }
-    }
-
-*/
-
-const styles = StyleSheet.create({
-    // viewport
-    viewport: {
-        position: 'absolute',
-        width: '100%',
-        height: '100%',
-        zIndex: 1,
-    },
-    // sections
-    section: {
-        width: '90%',
-        marginTop: 5,
-        marginBottom: 5,
-        backgroundColor: '#C13A3A',
-        borderStyle: 'solid',
-        borderRadius: 10,
-        borderColor: '#9A2E2E',
-        borderWidth: 3,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-evenly',
-        alignItems: 'center',
-    },
-    // containers (1st order)
-    taggedDataContainer: {
-        width: '90%',
-        height: 50,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexDirection: 'row',
-        marginTop: 5,
-        marginBottom: 5,
-    },
-    taggedDataContainerLast: {
-        width: '90%',
-        height: 50,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexDirection: 'row',
-        marginTop: 5,
-        marginBottom: 10,
-    },
-    // wrappers
-    nameWrapper: {
-        display: 'flex',
-        width: '90%',
-        height: 60,
-        borderRadius: 10,
-        backgroundColor: '#9A2E2E',
-        marginTop: 10,
-        marginBottom: 5,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    imageWrapper: {
-        display: 'flex',
-        flexDirection: 'row',
-        width: '90%',
-        height: 240,
-        marginTop: 5,
-        marginBottom: 10,
-        borderStyle: 'solid',
-        borderRadius: 10,
-        borderColor: '#9A2E2E',
-        borderWidth: 3,
-        backgroundColor: '#9A2E2E',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    sectionTitleWrapper: {
-        display: 'flex',
-        width: '90%',
-        height: 40,
-        borderRadius: 10,
-        backgroundColor: '#9A2E2E',
-        marginTop: 10,
-        marginBottom: 5,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    tagWrapper: {
-        display: 'flex',
-        height: '100%',
-        width: '32.5%',
-        borderRadius: 10,
-        backgroundColor: '#9A2E2E',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    dataWrapper: {
-        display: 'flex',
-        width: '62.5%',
-        height: '100%',
-        borderRadius: 10,
-        backgroundColor: '#9A2E2E',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    // text tags
-    dataText: {
-        color: '#FFFFFF',
-        fontSize: 15,
-    },
-    tagText: {
-        color: '#FFFFFF',
-        fontSize: 15,
-    },
-    characterNameText: {
-        color: '#FFFFFF',
-        fontSize: 30,
-    },
-    sectionTitleText: {
-        color: '#FFFFFF',
-        fontSize: 20,
-    },
-    characterImage: {
-        resizeMode: 'contain',
-        height: '100%',
-        width: '100%',
-    },
-    pressable: {
-        position: 'absolute',
-        right: 0,
-        top: 0,
-        height: 50,
-        width: 50,
-        backgroundColor: '#C13A3A',
-        zIndex: 2,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        opacity: 1,
-        borderBottomLeftRadius: 10,
-        borderStyle: 'solid',
-        borderColor: '#9A2E2E',
-        borderWidth: 3,
-    },
-    backButton: {
-        fontSize: 30,
-    },
-    scrollView: {
-        width: '100%',
-        backgroundColor: '#FFFFFF',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        overflow: 'scroll',
-    },
-});
 
 const CharacterInfoPage = (props) => {
     // const [characterInfo, setCharacterInfo] = React.useState('')
@@ -207,16 +42,48 @@ const CharacterInfoPage = (props) => {
                 <Text style={styles.backButton}>X</Text>
             </Pressable>
             <ScrollView contentContainerStyle={styles.scrollView}>
-                <View style={styles.section}>
+
+                <Section>
+                    <Section.Title>
+                        { props.characterInfo ? props.characterInfo.name.toString() : 'None.' }
+                    </Section.Title>
+                    <Section.TitleImage source={props.characterInfo ? {uri: props.characterInfo.image} : require('../../../img/rick_and_morty_logo.png')  } />
+                </Section>
+
+                {/* <View style={styles.section}>
                     <View style={styles.nameWrapper}>
                         <Text style={styles.characterNameText}>{ props.characterInfo ? props.characterInfo.name.toString() : 'None.' }</Text>
                     </View>
                     <View style={styles.imageWrapper}>
-                        <Image style={styles.characterImage} source={props.characterInfo ? {uri: props.characterInfo.image} : require('../img/rick_and_morty_logo.png')  }/>
+                        <Image style={styles.characterImage} source={props.characterInfo ? {uri: props.characterInfo.image} : require('../../../img/rick_and_morty_logo.png')  }/>
                     </View>
-                </View>
+                </View> */}
 
-                <View style={styles.section}>
+                <Section>
+                    <Section.Subtitle>Information</Section.Subtitle>
+
+                    <Section.TaggedData>
+                        <Section.TaggedData.Tag>Status</Section.TaggedData.Tag>
+                        <Section.TaggedData.Data>{ props.characterInfo ? props.characterInfo.status.toString() : 'None.' }</Section.TaggedData.Data>
+                    </Section.TaggedData>
+
+                    <Section.TaggedData>
+                        <Section.TaggedData.Tag>Species</Section.TaggedData.Tag>
+                        <Section.TaggedData.Data>{ props.characterInfo ? props.characterInfo.species.toString() : 'None.' }</Section.TaggedData.Data>
+                    </Section.TaggedData>
+
+                    <Section.TaggedData>
+                        <Section.TaggedData.Tag>Type</Section.TaggedData.Tag>
+                        <Section.TaggedData.Data>{ props.characterInfo.type ? props.characterInfo.type.toString() : 'None' }</Section.TaggedData.Data>
+                    </Section.TaggedData>
+
+                    <Section.TaggedData>
+                        <Section.TaggedData.Tag>Gender</Section.TaggedData.Tag>
+                        <Section.TaggedData.Data>{ props.characterInfo ? props.characterInfo.gender.toString() : 'None.' }</Section.TaggedData.Data>
+                    </Section.TaggedData>
+                </Section>
+
+                {/* <View style={styles.section}>
                     <View style={styles.sectionTitleWrapper}>
                         <Text style={styles.sectionTitleText}>Information</Text>
                     </View>
@@ -252,9 +119,17 @@ const CharacterInfoPage = (props) => {
                             <Text style={styles.dataText}>{ props.characterInfo ? props.characterInfo.gender.toString() : 'None.' }</Text>
                         </View>
                     </View>
-                </View>
+                </View> */}
 
-                <View style={styles.section}>
+                <Section>
+                    <Section.Subtitle>Origin</Section.Subtitle>
+                    <Section.TaggedData>
+                        <Section.TaggedData.Tag>Name</Section.TaggedData.Tag>
+                        <Section.TaggedData.Data>{ props.characterInfo ? props.characterInfo.origin.name.toString() : 'None'}</Section.TaggedData.Data>
+                    </Section.TaggedData>
+                </Section>
+
+                {/* <View style={styles.section}>
                     <View style={styles.sectionTitleWrapper}>
                         <Text style={styles.sectionTitleText}>Origin</Text>
                     </View>
@@ -266,9 +141,17 @@ const CharacterInfoPage = (props) => {
                             <Text style={styles.dataText}>{ props.characterInfo ? props.characterInfo.origin.name.toString() : 'None'}</Text>
                         </View>
                     </View>
-                </View>
+                </View> */}
 
-                <View style={styles.section}>
+                <Section>
+                    <Section.Subtitle>Last Known Location</Section.Subtitle>
+                    <Section.TaggedData>
+                        <Section.TaggedData.Tag>Name</Section.TaggedData.Tag>
+                        <Section.TaggedData.Data>{ props.characterInfo ? props.characterInfo.location.name.toString() : 'None'}</Section.TaggedData.Data>
+                    </Section.TaggedData>
+                </Section>
+
+                {/* <View style={styles.section}>
                     <View style={styles.sectionTitleWrapper}>
                         <Text style={styles.sectionTitleText}>Last Known Location</Text>
                     </View>
@@ -280,9 +163,17 @@ const CharacterInfoPage = (props) => {
                             <Text style={styles.dataText}>{ props.characterInfo ? props.characterInfo.location.name.toString() : 'None'}</Text>
                         </View>
                     </View>
-                </View>
+                </View> */}
 
-                <View style={styles.section}>
+                <Section>
+                    <Section.Subtitle>First Seen In</Section.Subtitle>
+                    <Section.TaggedData>
+                        <Section.TaggedData.Tag>Episode</Section.TaggedData.Tag>
+                        <Section.TaggedData.Data>{ episodeInfo ? episodeInfo.name.toString() : 'No hay episodio cargado' }</Section.TaggedData.Data>
+                    </Section.TaggedData>
+                </Section>
+
+                {/* <View style={styles.section}>
                     <View style={styles.sectionTitleWrapper}>
                         <Text style={styles.sectionTitleText}>First Seen In</Text>
                     </View>
@@ -294,7 +185,7 @@ const CharacterInfoPage = (props) => {
                             <Text style={styles.dataText}>{ episodeInfo ? episodeInfo.name.toString() : 'No hay episodio cargado' }</Text>
                         </View>
                     </View>
-                </View>
+                </View> */}
             </ScrollView>
         </View>
     );
