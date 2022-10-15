@@ -50,15 +50,6 @@ const CharacterInfoPage = (props) => {
                     <Section.TitleImage source={props.characterInfo ? {uri: props.characterInfo.image} : require('../../../img/rick_and_morty_logo.png')  } />
                 </Section>
 
-                {/* <View style={styles.section}>
-                    <View style={styles.nameWrapper}>
-                        <Text style={styles.characterNameText}>{ props.characterInfo ? props.characterInfo.name.toString() : 'None.' }</Text>
-                    </View>
-                    <View style={styles.imageWrapper}>
-                        <Image style={styles.characterImage} source={props.characterInfo ? {uri: props.characterInfo.image} : require('../../../img/rick_and_morty_logo.png')  }/>
-                    </View>
-                </View> */}
-
                 <Section>
                     <Section.Subtitle>Information</Section.Subtitle>
 
@@ -83,44 +74,6 @@ const CharacterInfoPage = (props) => {
                     </Section.TaggedData>
                 </Section>
 
-                {/* <View style={styles.section}>
-                    <View style={styles.sectionTitleWrapper}>
-                        <Text style={styles.sectionTitleText}>Information</Text>
-                    </View>
-                    <View style={styles.taggedDataContainer}>
-                        <View style={styles.tagWrapper}>
-                            <Text style={styles.tagText}>Status</Text>
-                        </View>
-                        <View style={styles.dataWrapper}>
-                            <Text style={styles.dataText}>{ props.characterInfo ? props.characterInfo.status.toString() : 'None.' }</Text>
-                        </View>
-                    </View>
-                    <View style={styles.taggedDataContainer}>
-                        <View style={styles.tagWrapper}>
-                            <Text style={styles.tagText}>Species</Text>
-                        </View>
-                        <View style={styles.dataWrapper}>
-                            <Text style={styles.dataText}>{ props.characterInfo ? props.characterInfo.species.toString() : 'None.' }</Text>
-                        </View>
-                    </View>
-                    <View style={styles.taggedDataContainer}>
-                        <View style={styles.tagWrapper}>
-                            <Text style={styles.tagText}>Type</Text>
-                        </View>
-                        <View style={styles.dataWrapper}>
-                            <Text style={styles.dataText}>{ props.characterInfo.type ? props.characterInfo.type.toString() : 'None' }</Text>
-                        </View>
-                    </View>
-                    <View style={styles.taggedDataContainerLast}>
-                        <View style={styles.tagWrapper}>
-                            <Text style={styles.tagText}>Gender</Text>
-                        </View>
-                        <View style={styles.dataWrapper}>
-                            <Text style={styles.dataText}>{ props.characterInfo ? props.characterInfo.gender.toString() : 'None.' }</Text>
-                        </View>
-                    </View>
-                </View> */}
-
                 <Section>
                     <Section.Subtitle>Origin</Section.Subtitle>
                     <Section.TaggedData>
@@ -128,20 +81,6 @@ const CharacterInfoPage = (props) => {
                         <Section.TaggedData.Data>{ props.characterInfo ? props.characterInfo.origin.name.toString() : 'None'}</Section.TaggedData.Data>
                     </Section.TaggedData>
                 </Section>
-
-                {/* <View style={styles.section}>
-                    <View style={styles.sectionTitleWrapper}>
-                        <Text style={styles.sectionTitleText}>Origin</Text>
-                    </View>
-                    <View style={styles.taggedDataContainerLast}>
-                        <View style={styles.tagWrapper}>
-                            <Text style={styles.tagText}>Name</Text>
-                        </View>
-                        <View style={styles.dataWrapper}>
-                            <Text style={styles.dataText}>{ props.characterInfo ? props.characterInfo.origin.name.toString() : 'None'}</Text>
-                        </View>
-                    </View>
-                </View> */}
 
                 <Section>
                     <Section.Subtitle>Last Known Location</Section.Subtitle>
@@ -151,20 +90,6 @@ const CharacterInfoPage = (props) => {
                     </Section.TaggedData>
                 </Section>
 
-                {/* <View style={styles.section}>
-                    <View style={styles.sectionTitleWrapper}>
-                        <Text style={styles.sectionTitleText}>Last Known Location</Text>
-                    </View>
-                    <View style={styles.taggedDataContainerLast}>
-                        <View style={styles.tagWrapper}>
-                            <Text style={styles.tagText}>Name</Text>
-                        </View>
-                        <View style={styles.dataWrapper}>
-                            <Text style={styles.dataText}>{ props.characterInfo ? props.characterInfo.location.name.toString() : 'None'}</Text>
-                        </View>
-                    </View>
-                </View> */}
-
                 <Section>
                     <Section.Subtitle>First Seen In</Section.Subtitle>
                     <Section.TaggedData>
@@ -172,20 +97,6 @@ const CharacterInfoPage = (props) => {
                         <Section.TaggedData.Data>{ episodeInfo ? episodeInfo.name.toString() : 'No hay episodio cargado' }</Section.TaggedData.Data>
                     </Section.TaggedData>
                 </Section>
-
-                {/* <View style={styles.section}>
-                    <View style={styles.sectionTitleWrapper}>
-                        <Text style={styles.sectionTitleText}>First Seen In</Text>
-                    </View>
-                    <View style={styles.taggedDataContainerLast}>
-                        <View style={styles.tagWrapper}>
-                            <Text style={styles.tagText}>Episode</Text>
-                        </View>
-                        <View style={styles.dataWrapper}>
-                            <Text style={styles.dataText}>{ episodeInfo ? episodeInfo.name.toString() : 'No hay episodio cargado' }</Text>
-                        </View>
-                    </View>
-                </View> */}
             </ScrollView>
         </View>
     );

@@ -3,7 +3,7 @@
 // import { useState } from 'react';
 // import MainPage from './src/MainPage';
 // import CharacterInfoPage from './src/CharacterInfoPage';
-import ResultsPage from './src/ResultsPage';
+import ResultsPage from './src/screens/ResultsScreen/ResultsPage';
 
 
 export default ResultsPage;

@@ -258,4 +258,4 @@ const selectButtons = StyleSheet.create({
     },
 });
 
-export default {styles, selectButtons};
+export {styles, selectButtons};

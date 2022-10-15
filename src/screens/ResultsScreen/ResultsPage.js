@@ -5,7 +5,6 @@ import {styles, selectButtons} from './styles';
 import CharacterCard from '../../components/CharacterCard/CharacterCard';
 
 
-
 const TaggedTextInput = props => {
     return (
         <View style={styles.taggedInputContainer}>
