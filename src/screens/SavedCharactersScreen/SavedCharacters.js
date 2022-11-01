@@ -1,6 +1,5 @@
-import { View, Text, Image, TextInput, Pressable, FlatList, Keyboard, Modal } from 'react-native';
-import React from 'react';
-import CharacterInfoPage from '../CharacterInfo/CharacterInfoPage';
+import { View, Text, Image, TextInput, Pressable, FlatList, Keyboard, BackHandler } from 'react-native';
+import React, { useEffect } from 'react';
 import {styles, selectButtons} from './styles';
 import CharacterCard from '../../components/CharacterCard/CharacterCard';
 
@@ -23,22 +22,20 @@ const TaggedTextInput = props => {
 };
 
 
-const SavedCharacters = props => {
+const SavedCharacters = ({route, navigation}) => {
 
     const flatListRef = React.useRef(null);
     const [currentFilters, setCurrentFilters] = React.useState({
-        species: props.species ? props.species : '',
-        type: props.type ? props.type : '',
-        name: props.name ? props.name : '',
-        status: props.status ? props.status : '',
-        gender: props.gender ? props.gender : '',
+        species: route.params.species ? route.params.species : '',
+        type: route.params.type ? route.params.type : '',
+        name: route.params.name ? route.params.name : '',
+        status: route.params.status ? route.params.status : '',
+        gender: route.params.gender ? route.params.gender : '',
     });
     const [temporaryFilters, setTemporaryFilters] = React.useState(currentFilters);
     const [filterOptionsStyle, setFilterOptionsStyle] = React.useState(styles.hiddenFilterOptionsSection);
     const [loading, setLoading] = React.useState(false);
-    const [charactersInfo, setCharactersInfo] = React.useState([{name: 'elo', status: 'jeje', episode: ['https://rickandmortyapi.com/api/episode/1']},{name: 'elo2', status: 'jeje', episode:['https://rickandmortyapi.com/api/episode/1']}]);
-    const [modalVisible, setModalVisible] = React.useState(false);
-    const [aCharacterInfo, setACharacterInfo] = React.useState({});
+    const [charactersInfo, setCharactersInfo] = React.useState([]);
     const [offset, setOffset] = React.useState(1);
     const [statusButtonsStyle, setStatusButtonsStyle] = React.useState({
         'alive': selectButtons.unselectedPressable,
@@ -54,8 +51,15 @@ const SavedCharacters = props => {
 
 
 
-    React.useEffect(() => {
-        getCharacters('https://rickandmortyapi.com/api/character?page=' + offset);
+    useEffect(() => {
+        getSavedCharacters('https://rickandmortyapi.com/api/character?page=' + offset);
+        const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            navigation.goBack
+        );
+
+        return () => backHandler.remove();
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -107,7 +111,7 @@ const SavedCharacters = props => {
     const applyFilter = () => {
         setOffset(1);
 
-        getCharacters(
+        getSavedCharacters(
             'https://rickandmortyapi.com/api/character/?page=1' +
             '&name=' + temporaryFilters.name +
             '&type=' + temporaryFilters.type +
@@ -120,7 +124,7 @@ const SavedCharacters = props => {
         setCurrentFilters(temporaryFilters);
     };
 
-    const getCharacters = (uriCharacter) => {
+    const getSavedCharacters = (uriCharacter) => {
 
         setLoading(true);
 
@@ -149,11 +153,13 @@ const SavedCharacters = props => {
     };
 
     const handleItemPress = (character) => {
-        setACharacterInfo(character);
-        setModalVisible(true);
+        navigation.navigate('CharacterInfo', character);
+
+        // setACharacterInfo(character);
+        // setModalVisible(true);
     };
 
-    const fetchMoreData = () => {
+    const fetchMoreSavedData = () => {
         fetch(
             'https://rickandmortyapi.com/api/character/?' +
             'page=' + offset +
@@ -306,7 +312,7 @@ const SavedCharacters = props => {
                 style={styles.flatList}
                 data={charactersInfo}
                 onEndReachedThreshold={0.1}
-                onEndReached={fetchMoreData}
+                onEndReached={fetchMoreSavedData}
                 ListHeaderComponent={() =>
                 {<Text>No hay personajes cargados</Text>;}}
                 showsHorizontalScrollIndicator={false}
@@ -315,14 +321,6 @@ const SavedCharacters = props => {
                 refreshing={loading}
             />
         </View>
-        <Modal
-        animationType="slide"
-        transparent={false}
-        visible={modalVisible}
-        onRequestClose={() => { setModalVisible(!modalVisible); }}>
-            <CharacterInfoPage visibilityCallback={setModalVisible} characterInfo={aCharacterInfo} />
-        </Modal>
-
     </View>
     );
 };

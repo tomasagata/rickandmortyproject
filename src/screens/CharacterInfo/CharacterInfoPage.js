@@ -1,18 +1,25 @@
 import React from 'react';
-import {View, Text, ScrollView, Pressable} from 'react-native';
+import {View, Text, ScrollView, Pressable, BackHandler} from 'react-native';
 import styles from './styles';
 import Section from '../../components/Sections/Sections';
 
 
 
-const CharacterInfoPage = (props) => {
+const CharacterInfoPage = ({route, navigation}) => {
     // const [characterInfo, setCharacterInfo] = React.useState('')
     const [episodeInfo, setEpisodeInfo] = React.useState('');
     // const [loading, setLoading] = React.useState(false);
     // const [selectedValue, setSelectedValue] = React.useState('java');
 
    React.useEffect(() => {
-        getEpisode(props.characterInfo.episode[0]);
+        getEpisode(route.params.characterInfo.episode[0]);
+        const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            navigation.goBack
+        );
+
+        return () => backHandler.remove();
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     // Los primeros parentesis no hacen nada, donde van las llaves va el código,
@@ -38,16 +45,16 @@ const CharacterInfoPage = (props) => {
 
     return (
         <View style={styles.viewport}>
-            <Pressable style={styles.pressable} onPress={() => {props.visibilityCallback(false);}}>
+            <Pressable style={styles.pressable} onPress={() => {navigation.goBack();}}>
                 <Text style={styles.backButton}>X</Text>
             </Pressable>
             <ScrollView contentContainerStyle={styles.scrollView}>
 
                 <Section>
                     <Section.Title>
-                        { props.characterInfo ? props.characterInfo.name.toString() : 'None.' }
+                        { route.params.characterInfo ? route.params.characterInfo.name.toString() : 'None.' }
                     </Section.Title>
-                    <Section.TitleImage source={props.characterInfo ? {uri: props.characterInfo.image} : require('../../../img/rick_and_morty_logo.png')  } />
+                    <Section.TitleImage source={route.params.characterInfo ? {uri: route.params.characterInfo.image} : require('../../../img/rick_and_morty_logo.png')  } />
                 </Section>
 
                 <Section>
@@ -55,22 +62,22 @@ const CharacterInfoPage = (props) => {
 
                     <Section.TaggedData>
                         <Section.TaggedData.Tag>Status</Section.TaggedData.Tag>
-                        <Section.TaggedData.Data>{ props.characterInfo ? props.characterInfo.status.toString() : 'None.' }</Section.TaggedData.Data>
+                        <Section.TaggedData.Data>{ route.params.characterInfo ? route.params.characterInfo.status.toString() : 'None.' }</Section.TaggedData.Data>
                     </Section.TaggedData>
 
                     <Section.TaggedData>
                         <Section.TaggedData.Tag>Species</Section.TaggedData.Tag>
-                        <Section.TaggedData.Data>{ props.characterInfo ? props.characterInfo.species.toString() : 'None.' }</Section.TaggedData.Data>
+                        <Section.TaggedData.Data>{ route.params.characterInfo ? route.params.characterInfo.species.toString() : 'None.' }</Section.TaggedData.Data>
                     </Section.TaggedData>
 
                     <Section.TaggedData>
                         <Section.TaggedData.Tag>Type</Section.TaggedData.Tag>
-                        <Section.TaggedData.Data>{ props.characterInfo.type ? props.characterInfo.type.toString() : 'None' }</Section.TaggedData.Data>
+                        <Section.TaggedData.Data>{ route.params.characterInfo.type ? route.params.characterInfo.type.toString() : 'None' }</Section.TaggedData.Data>
                     </Section.TaggedData>
 
                     <Section.TaggedData>
                         <Section.TaggedData.Tag>Gender</Section.TaggedData.Tag>
-                        <Section.TaggedData.Data>{ props.characterInfo ? props.characterInfo.gender.toString() : 'None.' }</Section.TaggedData.Data>
+                        <Section.TaggedData.Data>{ route.params.characterInfo ? route.params.characterInfo.gender.toString() : 'None.' }</Section.TaggedData.Data>
                     </Section.TaggedData>
                 </Section>
 
@@ -78,7 +85,7 @@ const CharacterInfoPage = (props) => {
                     <Section.Subtitle>Origin</Section.Subtitle>
                     <Section.TaggedData>
                         <Section.TaggedData.Tag>Name</Section.TaggedData.Tag>
-                        <Section.TaggedData.Data>{ props.characterInfo ? props.characterInfo.origin.name.toString() : 'None'}</Section.TaggedData.Data>
+                        <Section.TaggedData.Data>{ route.params.characterInfo ? route.params.characterInfo.origin.name.toString() : 'None'}</Section.TaggedData.Data>
                     </Section.TaggedData>
                 </Section>
 
@@ -86,7 +93,7 @@ const CharacterInfoPage = (props) => {
                     <Section.Subtitle>Last Known Location</Section.Subtitle>
                     <Section.TaggedData>
                         <Section.TaggedData.Tag>Name</Section.TaggedData.Tag>
-                        <Section.TaggedData.Data>{ props.characterInfo ? props.characterInfo.location.name.toString() : 'None'}</Section.TaggedData.Data>
+                        <Section.TaggedData.Data>{ route.params.characterInfo ? route.params.characterInfo.location.name.toString() : 'None'}</Section.TaggedData.Data>
                     </Section.TaggedData>
                 </Section>
 
