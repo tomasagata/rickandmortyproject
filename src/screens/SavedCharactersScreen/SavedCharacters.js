@@ -148,7 +148,7 @@ const SavedCharacters = ({route, navigation}) => {
         });
 
         if (flatListRef.current && charactersInfo !== undefined){
-            flatListRef.current.scrollToIndex({index: 1});
+            flatListRef.current.scrollToIndex({index: 0});
         }
     };
 

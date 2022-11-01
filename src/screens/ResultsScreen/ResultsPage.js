@@ -127,14 +127,16 @@ const ResultsPage = ({route, navigation}) => {
     const getCharacters = (uriCharacter) => {
 
         setLoading(true);
-        console.log('URI Character: ' + uriCharacter);
+
         fetch(uriCharacter)
         .then(res => res.json()) /** una vez que el servidor responde, la respuesta se convierte en json */
         .then(res => {
             // Preguntar si la query tiene resultados previene que se añadan datos invalidos
             // al flatlist
 
-            setCharactersInfo(res.results);
+            if (res.results) {
+                setCharactersInfo(res.results);
+            }
             setOffset(2);
 
             setLoading(false);
@@ -147,9 +149,8 @@ const ResultsPage = ({route, navigation}) => {
             console.log('There has been a problem with your fetch operation: ' + error.message);
         });
 
-        console.log('Characters Info' + charactersInfo);
         if (flatListRef.current && charactersInfo !== undefined){
-            flatListRef.current.scrollToIndex({index: 1});
+            flatListRef.current.scrollToIndex({index: 0});
         }
     };
 
