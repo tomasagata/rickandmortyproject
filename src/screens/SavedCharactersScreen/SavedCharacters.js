@@ -26,11 +26,11 @@ const SavedCharacters = ({route, navigation}) => {
 
     const flatListRef = React.useRef(null);
     const [currentFilters, setCurrentFilters] = React.useState({
-        species: route.params.species ? route.params.species : '',
-        type: route.params.type ? route.params.type : '',
-        name: route.params.name ? route.params.name : '',
-        status: route.params.status ? route.params.status : '',
-        gender: route.params.gender ? route.params.gender : '',
+        species: route.params?.species ?? '',
+        type: route.params?.type ?? '',
+        name: route.params?.name ?? '',
+        status: route.params?.status ?? '',
+        gender: route.params?.gender ?? '',
     });
     const [temporaryFilters, setTemporaryFilters] = React.useState(currentFilters);
     const [filterOptionsStyle, setFilterOptionsStyle] = React.useState(styles.hiddenFilterOptionsSection);
