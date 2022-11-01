@@ -25,6 +25,8 @@ const TaggedTextInput = props => {
 const ResultsPage = ({route, navigation}) => {
 
     const flatListRef = React.useRef(null);
+    console.log(route);
+    console.log("ACAAAAA\n\n\n");
     const [currentFilters, setCurrentFilters] = React.useState({
         species: route.params.species ? route.params.species : '',
         type: route.params.type ? route.params.type : '',
