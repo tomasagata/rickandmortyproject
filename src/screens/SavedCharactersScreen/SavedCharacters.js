@@ -56,6 +56,10 @@ const SavedCharacters = ({route, navigation}) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    const goToResults = () => {
+        navigation.navigate('Results');
+    };
+
     const setStatus = (value) => {
         let unSelectedStyle = {
             'alive': selectButtons.unselectedPressable,
@@ -288,10 +292,17 @@ const SavedCharacters = ({route, navigation}) => {
             <View style={styles.resultTextWrapper}>
                 <Text style={styles.resultText}>Favorites</Text>
             </View>
-            <View style={styles.filterButtonWrapper}>
-                <Pressable onPress={showFilterOptions} style={styles.filterButton}>
-                    <Image style={styles.filterButtonImage} source={require('../../../img/filter.png')}/>
-                </Pressable>
+            <View style={styles.headerButtonsWrapper}>
+                <View style={styles.favoritesButtonWrapper}>
+                    <Pressable onPress={goToResults} style={styles.favoritesButton}>
+                        <Image style={styles.favoritesButtonImage} source={require('../../../img/favorites.png')}/>
+                    </Pressable>
+                </View>
+                <View style={styles.filterButtonWrapper}>
+                    <Pressable onPress={showFilterOptions} style={styles.filterButton}>
+                        <Image style={styles.filterButtonImage} source={require('../../../img/filter.png')}/>
+                    </Pressable>
+                </View>
             </View>
         </View>
 
