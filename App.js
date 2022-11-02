@@ -16,7 +16,7 @@ const App = () => {
 
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName="Results">
+            <Stack.Navigator initialRouteName="Results" screenOptions={{headerShown: false}}>
                 <Stack.Screen name="Results" component={ResultsPage} />
                 <Stack.Screen name="CharacterInfo" component={CharacterInfoPage} />
                 <Stack.Screen name="SavedCharacters" component={SavedCharacters} />

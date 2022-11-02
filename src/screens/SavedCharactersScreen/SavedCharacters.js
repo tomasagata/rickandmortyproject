@@ -1,5 +1,5 @@
-import { View, Text, Image, TextInput, Pressable, FlatList, Keyboard, BackHandler } from 'react-native';
-import React, { useEffect } from 'react';
+import { View, Text, Image, TextInput, Pressable, FlatList, Keyboard } from 'react-native';
+import React from 'react';
 import {styles, selectButtons} from './styles';
 import CharacterCard from '../../components/CharacterCard/CharacterCard';
 
@@ -51,15 +51,8 @@ const SavedCharacters = ({route, navigation}) => {
 
 
 
-    useEffect(() => {
+    React.useEffect(() => {
         getSavedCharacters('https://rickandmortyapi.com/api/character?page=' + offset);
-        const backHandler = BackHandler.addEventListener(
-            'hardwareBackPress',
-            navigation.goBack
-        );
-
-        return () => backHandler.remove();
-
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -146,10 +139,6 @@ const SavedCharacters = ({route, navigation}) => {
         .catch(function(error) {
             console.log('There has been a problem with your fetch operation: ' + error.message);
         });
-
-        if (flatListRef.current && charactersInfo !== undefined){
-            flatListRef.current.scrollToIndex({index: 0});
-        }
     };
 
     const handleItemPress = (character) => {
@@ -297,7 +286,7 @@ const SavedCharacters = ({route, navigation}) => {
 
         <View style={styles.headerSection}>
             <View style={styles.resultTextWrapper}>
-                <Text style={styles.resultText}>Results</Text>
+                <Text style={styles.resultText}>Favorites</Text>
             </View>
             <View style={styles.filterButtonWrapper}>
                 <Pressable onPress={showFilterOptions} style={styles.filterButton}>

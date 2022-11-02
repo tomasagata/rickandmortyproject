@@ -1,5 +1,5 @@
-import { View, Text, Image, TextInput, Pressable, FlatList, Keyboard, BackHandler } from 'react-native';
-import React, { useEffect } from 'react';
+import { View, Text, Image, TextInput, Pressable, FlatList, Keyboard } from 'react-native';
+import React from 'react';
 import {styles, selectButtons} from './styles';
 import CharacterCard from '../../components/CharacterCard/CharacterCard';
 
@@ -51,17 +51,14 @@ const ResultsPage = ({route, navigation}) => {
 
 
 
-    useEffect(() => {
+    React.useEffect(() => {
         getCharacters('https://rickandmortyapi.com/api/character?page=' + offset);
-        const backHandler = BackHandler.addEventListener(
-            'hardwareBackPress',
-            navigation.goBack
-        );
-
-        return () => backHandler.remove();
-
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const goToFavorites = () => {
+        navigation.navigate('SavedCharacters');
+    };
 
     const setStatus = (value) => {
         let unSelectedStyle = {
@@ -134,13 +131,11 @@ const ResultsPage = ({route, navigation}) => {
             // Preguntar si la query tiene resultados previene que se añadan datos invalidos
             // al flatlist
 
-            if (res.results) {
-                setCharactersInfo(res.results);
-            }
+            setCharactersInfo(res.results);
             setOffset(2);
 
             setLoading(false);
-
+            console.log(res.results);
             /**setLocationInfo(res.location)
             setEpisodeInfo(res.episode)*/
 
@@ -148,10 +143,6 @@ const ResultsPage = ({route, navigation}) => {
         .catch(function(error) {
             console.log('There has been a problem with your fetch operation: ' + error.message);
         });
-
-        if (flatListRef.current && charactersInfo !== undefined){
-            flatListRef.current.scrollToIndex({index: 0});
-        }
     };
 
     const handleItemPress = (character) => {
@@ -301,10 +292,17 @@ const ResultsPage = ({route, navigation}) => {
             <View style={styles.resultTextWrapper}>
                 <Text style={styles.resultText}>Results</Text>
             </View>
-            <View style={styles.filterButtonWrapper}>
-                <Pressable onPress={showFilterOptions} style={styles.filterButton}>
-                    <Image style={styles.filterButtonImage} source={require('../../../img/filter.png')}/>
-                </Pressable>
+            <View style={styles.headerButtonsWrapper}>
+                <View style={styles.favoritesButtonWrapper}>
+                    <Pressable onPress={goToFavorites} style={styles.favoritesButton}>
+                        <Image style={styles.favoritesButtonImage} source={require('../../../img/favorites.png')}/>
+                    </Pressable>
+                </View>
+                <View style={styles.filterButtonWrapper}>
+                    <Pressable onPress={showFilterOptions} style={styles.filterButton}>
+                        <Image style={styles.filterButtonImage} source={require('../../../img/filter.png')}/>
+                    </Pressable>
+                </View>
             </View>
         </View>
 

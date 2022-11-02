@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, ScrollView, Pressable, BackHandler} from 'react-native';
+import {View, Text, ScrollView, Pressable} from 'react-native';
 import styles from './styles';
 import Section from '../../components/Sections/Sections';
 
@@ -11,15 +11,10 @@ const CharacterInfoPage = ({route, navigation}) => {
     // const [loading, setLoading] = React.useState(false);
     // const [selectedValue, setSelectedValue] = React.useState('java');
 
+    console.log(route.params);
+
    React.useEffect(() => {
-        getEpisode(route.params.characterInfo.episode[0]);
-        const backHandler = BackHandler.addEventListener(
-            'hardwareBackPress',
-            navigation.goBack
-        );
-
-        return () => backHandler.remove();
-
+        getEpisode(route.params.episode[0]);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     // Los primeros parentesis no hacen nada, donde van las llaves va el código,
@@ -52,9 +47,9 @@ const CharacterInfoPage = ({route, navigation}) => {
 
                 <Section>
                     <Section.Title>
-                        { route.params.characterInfo ? route.params.characterInfo.name.toString() : 'None.' }
+                        { route.params ? route.params.name.toString() : 'None.' }
                     </Section.Title>
-                    <Section.TitleImage source={route.params.characterInfo ? {uri: route.params.characterInfo.image} : require('../../../img/rick_and_morty_logo.png')  } />
+                    <Section.TitleImage source={route.params ? {uri: route.params.image} : require('../../../img/rick_and_morty_logo.png')  } />
                 </Section>
 
                 <Section>
@@ -62,22 +57,22 @@ const CharacterInfoPage = ({route, navigation}) => {
 
                     <Section.TaggedData>
                         <Section.TaggedData.Tag>Status</Section.TaggedData.Tag>
-                        <Section.TaggedData.Data>{ route.params.characterInfo ? route.params.characterInfo.status.toString() : 'None.' }</Section.TaggedData.Data>
+                        <Section.TaggedData.Data>{ route.params ? route.params.status.toString() : 'None.' }</Section.TaggedData.Data>
                     </Section.TaggedData>
 
                     <Section.TaggedData>
                         <Section.TaggedData.Tag>Species</Section.TaggedData.Tag>
-                        <Section.TaggedData.Data>{ route.params.characterInfo ? route.params.characterInfo.species.toString() : 'None.' }</Section.TaggedData.Data>
+                        <Section.TaggedData.Data>{ route.params ? route.params.species.toString() : 'None.' }</Section.TaggedData.Data>
                     </Section.TaggedData>
 
                     <Section.TaggedData>
                         <Section.TaggedData.Tag>Type</Section.TaggedData.Tag>
-                        <Section.TaggedData.Data>{ route.params.characterInfo.type ? route.params.characterInfo.type.toString() : 'None' }</Section.TaggedData.Data>
+                        <Section.TaggedData.Data>{ route.params.type ? route.params.type.toString() : 'None' }</Section.TaggedData.Data>
                     </Section.TaggedData>
 
                     <Section.TaggedData>
                         <Section.TaggedData.Tag>Gender</Section.TaggedData.Tag>
-                        <Section.TaggedData.Data>{ route.params.characterInfo ? route.params.characterInfo.gender.toString() : 'None.' }</Section.TaggedData.Data>
+                        <Section.TaggedData.Data>{ route.params ? route.params.gender.toString() : 'None.' }</Section.TaggedData.Data>
                     </Section.TaggedData>
                 </Section>
 
@@ -85,7 +80,7 @@ const CharacterInfoPage = ({route, navigation}) => {
                     <Section.Subtitle>Origin</Section.Subtitle>
                     <Section.TaggedData>
                         <Section.TaggedData.Tag>Name</Section.TaggedData.Tag>
-                        <Section.TaggedData.Data>{ route.params.characterInfo ? route.params.characterInfo.origin.name.toString() : 'None'}</Section.TaggedData.Data>
+                        <Section.TaggedData.Data>{ route.params ? route.params.origin.name.toString() : 'None'}</Section.TaggedData.Data>
                     </Section.TaggedData>
                 </Section>
 
@@ -93,7 +88,7 @@ const CharacterInfoPage = ({route, navigation}) => {
                     <Section.Subtitle>Last Known Location</Section.Subtitle>
                     <Section.TaggedData>
                         <Section.TaggedData.Tag>Name</Section.TaggedData.Tag>
-                        <Section.TaggedData.Data>{ route.params.characterInfo ? route.params.characterInfo.location.name.toString() : 'None'}</Section.TaggedData.Data>
+                        <Section.TaggedData.Data>{ route.params.characterInfo ? route.params.location.name.toString() : 'None'}</Section.TaggedData.Data>
                     </Section.TaggedData>
                 </Section>
 
