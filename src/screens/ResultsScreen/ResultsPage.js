@@ -135,7 +135,6 @@ const ResultsPage = ({route, navigation}) => {
             setOffset(2);
 
             setLoading(false);
-            console.log(res.results);
             /**setLocationInfo(res.location)
             setEpisodeInfo(res.episode)*/
 

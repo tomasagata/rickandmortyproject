@@ -9,8 +9,14 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ResultsPage from './src/screens/ResultsScreen/ResultsPage';
 import CharacterInfoPage from './src/screens/CharacterInfo/CharacterInfoPage';
 import SavedCharacters from './src/screens/SavedCharactersScreen/SavedCharacters';
+import firebase from '@react-native-firebase/app';
+import firebaseConfig from './.firebaseconfig';
 
 const App = () => {
+
+    if (!firebase.apps.length){
+        firebase.initializeApp(firebaseConfig);
+    }
 
     const Stack = createNativeStackNavigator();
 
