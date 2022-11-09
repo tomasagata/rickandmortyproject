@@ -34,7 +34,11 @@ const SavedCharacters = ({route, navigation}) => {
             (snapshot) => {
                 let characters = snapshot.val();
                 if (characters) {
+                    // There are characters in favorites
                     setCharactersInfo(Object.values(characters));
+                } else {
+                    // There are no characters available
+                    setCharactersInfo([]);
                 }
                 setLoading(false);
             },
