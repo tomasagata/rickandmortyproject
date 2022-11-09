@@ -1,6 +1,5 @@
-import { View, Text, Image, TextInput, Pressable, FlatList, Keyboard, Modal } from 'react-native';
+import { View, Text, Image, TextInput, Pressable, FlatList, Keyboard } from 'react-native';
 import React from 'react';
-import CharacterInfoPage from '../CharacterInfo/CharacterInfoPage';
 import {styles, selectButtons} from './styles';
 import CharacterCard from '../../components/CharacterCard/CharacterCard';
 
@@ -23,22 +22,20 @@ const TaggedTextInput = props => {
 };
 
 
-const ResultsPage = props => {
+const ResultsPage = ({route, navigation}) => {
 
     const flatListRef = React.useRef(null);
     const [currentFilters, setCurrentFilters] = React.useState({
-        species: props.species ? props.species : '',
-        type: props.type ? props.type : '',
-        name: props.name ? props.name : '',
-        status: props.status ? props.status : '',
-        gender: props.gender ? props.gender : '',
+        species: route.params?.species ?? '',
+        type: route.params?.type ?? '',
+        name: route.params?.name ?? '',
+        status: route.params?.status ?? '',
+        gender: route.params?.gender ?? '',
     });
     const [temporaryFilters, setTemporaryFilters] = React.useState(currentFilters);
     const [filterOptionsStyle, setFilterOptionsStyle] = React.useState(styles.hiddenFilterOptionsSection);
     const [loading, setLoading] = React.useState(false);
-    const [charactersInfo, setCharactersInfo] = React.useState([{name: 'elo', status: 'jeje', episode: ['https://rickandmortyapi.com/api/episode/1']},{name: 'elo2', status: 'jeje', episode:['https://rickandmortyapi.com/api/episode/1']}]);
-    const [modalVisible, setModalVisible] = React.useState(false);
-    const [aCharacterInfo, setACharacterInfo] = React.useState({});
+    const [charactersInfo, setCharactersInfo] = React.useState([]);
     const [offset, setOffset] = React.useState(1);
     const [statusButtonsStyle, setStatusButtonsStyle] = React.useState({
         'alive': selectButtons.unselectedPressable,
@@ -58,6 +55,10 @@ const ResultsPage = props => {
         getCharacters('https://rickandmortyapi.com/api/character?page=' + offset);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const goToFavorites = () => {
+        navigation.navigate('SavedCharacters');
+    };
 
     const setStatus = (value) => {
         let unSelectedStyle = {
@@ -134,7 +135,6 @@ const ResultsPage = props => {
             setOffset(2);
 
             setLoading(false);
-
             /**setLocationInfo(res.location)
             setEpisodeInfo(res.episode)*/
 
@@ -142,15 +142,13 @@ const ResultsPage = props => {
         .catch(function(error) {
             console.log('There has been a problem with your fetch operation: ' + error.message);
         });
-
-        if (flatListRef.current && charactersInfo !== undefined){
-            flatListRef.current.scrollToIndex({index: 0});
-        }
     };
 
     const handleItemPress = (character) => {
-        setACharacterInfo(character);
-        setModalVisible(true);
+        navigation.navigate('CharacterInfo', character);
+
+        // setACharacterInfo(character);
+        // setModalVisible(true);
     };
 
     const fetchMoreData = () => {
@@ -293,10 +291,17 @@ const ResultsPage = props => {
             <View style={styles.resultTextWrapper}>
                 <Text style={styles.resultText}>Results</Text>
             </View>
-            <View style={styles.filterButtonWrapper}>
-                <Pressable onPress={showFilterOptions} style={styles.filterButton}>
-                    <Image style={styles.filterButtonImage} source={require('../../../img/filter.png')}/>
-                </Pressable>
+            <View style={styles.headerButtonsWrapper}>
+                <View style={styles.favoritesButtonWrapper}>
+                    <Pressable onPress={goToFavorites} style={styles.favoritesButton}>
+                        <Image style={styles.favoritesButtonImage} source={require('../../../img/favorites.png')}/>
+                    </Pressable>
+                </View>
+                <View style={styles.filterButtonWrapper}>
+                    <Pressable onPress={showFilterOptions} style={styles.filterButton}>
+                        <Image style={styles.filterButtonImage} source={require('../../../img/filter.png')}/>
+                    </Pressable>
+                </View>
             </View>
         </View>
 
@@ -315,14 +320,6 @@ const ResultsPage = props => {
                 refreshing={loading}
             />
         </View>
-        <Modal
-        animationType="slide"
-        transparent={false}
-        visible={modalVisible}
-        onRequestClose={() => { setModalVisible(!modalVisible); }}>
-            <CharacterInfoPage visibilityCallback={setModalVisible} characterInfo={aCharacterInfo} />
-        </Modal>
-
     </View>
     );
 };
