@@ -36,7 +36,7 @@ const ResultsPage = ({route, navigation}) => {
     const [temporaryFilters, setTemporaryFilters] = React.useState(currentFilters);
     const [filterOptionsStyle, setFilterOptionsStyle] = React.useState(styles.hiddenFilterOptionsSection);
     const [loading, setLoading] = React.useState(false);
-    const [charactersInfo, setCharactersInfo] = React.useState([]);
+    const [shownCharacters, setShownCharacters] = React.useState([]);
     const [offset, setOffset] = React.useState(1);
     const [statusButtonsStyle, setStatusButtonsStyle] = React.useState({
         'alive': selectButtons.unselectedPressable,
@@ -49,30 +49,44 @@ const ResultsPage = ({route, navigation}) => {
         'genderless': selectButtons.unselectedPressable,
         'unknown': selectButtons.unselectedPressable,
     });
-
-
+    const [favoriteCharacterIds, setFavoriteCharacterIds] = React.useState([]);
 
     React.useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', () => {
-            getCharacters('https://rickandmortyapi.com/api/character?page=' + offset);
+        let unsubscribe = navigation.addListener('focus', () => {
+            getFavoriteCharacters();
         });
         return unsubscribe;
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [navigation]);
 
-    const getExcludedCharacters = async () => {
-        let snapshot = await database().ref().child('favorite_data').once('value');
 
-        var characters = snapshot.val();
-        if (characters !== null) {
-            // There are characters in favorites
-            var excCharacters = (Object.values(characters).map((c) => c.id));
-        } else {
-            // There are no characters available
-            var excCharacters = [];
-        }
+    // similar a un didComponentUpdate
+    React.useEffect(() => {
+        getCharacters('https://rickandmortyapi.com/api/character?page=' + offset);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-        return excCharacters;
+    React.useEffect(() => {
+        updateCharacterList();
+    }, [favoriteCharacterIds]);
+
+    const getFavoriteCharacters = () => {
+        database().ref().child('favorite_ids').once('value').then((snapshot) => {
+            var characters = snapshot.val();
+            if (characters !== null) {
+                // There are characters in favorites
+                setFavoriteCharacterIds(Object.values(characters).map((c) => c.character_id));
+            } else {
+                // There are no characters available
+                setFavoriteCharacterIds([]);
+            }
+        });
+    };
+
+    const updateCharacterList = () => {
+        let newShownCharacters = shownCharacters.filter((item) => {
+            return favoriteCharacterIds.includes(item.id) === false;
+        });
+        setShownCharacters(newShownCharacters);
     };
 
     const goToFavorites = () => {
@@ -143,22 +157,13 @@ const ResultsPage = ({route, navigation}) => {
     const getCharacters = (uriCharacter) => {
 
         fetch(uriCharacter)
-        .then(res => res.json()) /** una vez que el servidor responde, la respuesta se convierte en json */
+        .then(res => res.json())
         .then(res => {
-            // Preguntar si la query tiene resultados previene que se añadan datos invalidos
-            // al flatlist
-            getExcludedCharacters().then((excCharacters) => {
-                let resultingCharacters = res.results.filter((item) => {
-                    return (excCharacters.includes(item.id) === false);
-                });
-                setCharactersInfo(resultingCharacters);
-            });
-
+            let results = res.results;
+            if (results !== undefined) {
+                setShownCharacters(results);
+            }
             setOffset(2);
-
-            /**setLocationInfo(res.location)
-            setEpisodeInfo(res.episode)*/
-
         })
         .catch(function(error) {
             console.log('There has been a problem with your fetch operation: ' + error.message);
@@ -167,9 +172,6 @@ const ResultsPage = ({route, navigation}) => {
 
     const handleItemPress = (character) => {
         navigation.navigate('CharacterInfo', character);
-
-        // setACharacterInfo(character);
-        // setModalVisible(true);
     };
 
     const fetchMoreData = () => {
@@ -180,17 +182,12 @@ const ResultsPage = ({route, navigation}) => {
             '&status=' + currentFilters.status +
             '&species=' + currentFilters.species +
             '&gender=' + currentFilters.gender)
-        .then(res => res.json()) /** una vez que el servidor responde, la respuesta se convierte en json */
+        .then(res => res.json())
         .then(res => {
-            // Preguntar si la query tiene resultados previene que se añadan datos invalidos
-            // al flatlist
-            if (res.results) {
-                getExcludedCharacters().then((excCharacters) => {
-                    let resultingCharacters = res.results.filter((item) => {
-                        return (!excCharacters.includes(item.id));
-                    });
-                    setCharactersInfo([...charactersInfo, ...resultingCharacters]);
-                });
+            let results = res.results;
+            if (results) {
+                let newShownCharacters = [...shownCharacters, ...results].filter((item) => favoriteCharacterIds.includes(item.id) === false);
+                setShownCharacters(newShownCharacters);
                 setOffset(offset + 1);
             }
 
@@ -207,8 +204,7 @@ const ResultsPage = ({route, navigation}) => {
             duration: 500,
             useNativeDriver: true,
         }).start(() => {
-            // Reset CharacterInfo
-            setCharactersInfo(charactersInfo.filter((c) => c.id !== id));
+            setShownCharacters(shownCharacters.filter((c) => c.id !== id));
         });
     };
 
@@ -221,13 +217,11 @@ const ResultsPage = ({route, navigation}) => {
         return (
         <CharacterCard
             onPress={() => handleItemPress(item)}
-            name={item.name ? item.name.toString() : 'None.'}
-            image={item.image}
             favoritePressCallback={addToFavorites}
-            id={item.id}
+            characterData={item}
+            favoritePressAction={'add'}
         />);
     };
-
 
     return (
 
@@ -347,7 +341,7 @@ const ResultsPage = ({route, navigation}) => {
             <FlatList
                 ref={flatListRef}
                 style={styles.flatList}
-                data={charactersInfo}
+                data={shownCharacters}
                 onEndReachedThreshold={0.1}
                 onEndReached={fetchMoreData}
                 showsHorizontalScrollIndicator={false}

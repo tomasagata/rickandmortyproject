@@ -1,4 +1,4 @@
-import { View, Text, Image, Pressable, FlatList } from 'react-native';
+import { View, Text, Image, Pressable, FlatList, Animated } from 'react-native';
 import React from 'react';
 import {styles} from './styles';
 import CharacterCard from '../../components/CharacterCard/CharacterCard';
@@ -53,6 +53,16 @@ const SavedCharacters = ({route, navigation}) => {
         navigation.navigate('CharacterInfo', character);
     };
 
+    const removeFromFavorites = (translateValueRef, id) => {
+        Animated.timing(translateValueRef, {
+            toValue: -300,
+            duration: 500,
+            useNativeDriver: true,
+        }).start(() => {
+            setCharactersInfo(charactersInfo.filter((c) => c.id !== id));
+        });
+    };
+
     // Siguiendo las recomendaciones de reactnative.dev/docs,
     // renderItem de la flatList no debería tener una función anonima
     // puesto que se crea una nueva para cada elemento. En cambio,
@@ -62,8 +72,9 @@ const SavedCharacters = ({route, navigation}) => {
         return (
         <CharacterCard
             onPress={() => handleItemPress(item)}
-            name={item.name ? item.name.toString() : 'None.'}
-            image={item.image}
+            characterData={item}
+            favoritePressCallback={removeFromFavorites}
+            favoritePressAction={'remove'}
         />);
     };
 
