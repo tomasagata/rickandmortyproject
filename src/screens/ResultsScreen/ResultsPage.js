@@ -1,7 +1,8 @@
-import { View, Text, Image, TextInput, Pressable, FlatList, Keyboard } from 'react-native';
+import { View, Text, Image, TextInput, Pressable, FlatList, Keyboard, Animated } from 'react-native';
 import React from 'react';
 import {styles, selectButtons} from './styles';
 import CharacterCard from '../../components/CharacterCard/CharacterCard';
+import database from '@react-native-firebase/database';
 
 
 const TaggedTextInput = props => {
@@ -52,9 +53,27 @@ const ResultsPage = ({route, navigation}) => {
 
 
     React.useEffect(() => {
-        getCharacters('https://rickandmortyapi.com/api/character?page=' + offset);
+        const unsubscribe = navigation.addListener('focus', () => {
+            getCharacters('https://rickandmortyapi.com/api/character?page=' + offset);
+        });
+        return unsubscribe;
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [navigation]);
+
+    const getExcludedCharacters = async () => {
+        let snapshot = await database().ref().child('favorite_data').once('value');
+
+        var characters = snapshot.val();
+        if (characters !== null) {
+            // There are characters in favorites
+            var excCharacters = (Object.values(characters).map((c) => c.id));
+        } else {
+            // There are no characters available
+            var excCharacters = [];
+        }
+
+        return excCharacters;
+    };
 
     const goToFavorites = () => {
         navigation.navigate('SavedCharacters');
@@ -123,18 +142,20 @@ const ResultsPage = ({route, navigation}) => {
 
     const getCharacters = (uriCharacter) => {
 
-        setLoading(true);
-
         fetch(uriCharacter)
         .then(res => res.json()) /** una vez que el servidor responde, la respuesta se convierte en json */
         .then(res => {
             // Preguntar si la query tiene resultados previene que se añadan datos invalidos
             // al flatlist
+            getExcludedCharacters().then((excCharacters) => {
+                let resultingCharacters = res.results.filter((item) => {
+                    return (excCharacters.includes(item.id) === false);
+                });
+                setCharactersInfo(resultingCharacters);
+            });
 
-            setCharactersInfo(res.results);
             setOffset(2);
 
-            setLoading(false);
             /**setLocationInfo(res.location)
             setEpisodeInfo(res.episode)*/
 
@@ -164,7 +185,12 @@ const ResultsPage = ({route, navigation}) => {
             // Preguntar si la query tiene resultados previene que se añadan datos invalidos
             // al flatlist
             if (res.results) {
-                setCharactersInfo([...charactersInfo, ...res.results]);
+                getExcludedCharacters().then((excCharacters) => {
+                    let resultingCharacters = res.results.filter((item) => {
+                        return (!excCharacters.includes(item.id));
+                    });
+                    setCharactersInfo([...charactersInfo, ...resultingCharacters]);
+                });
                 setOffset(offset + 1);
             }
 
@@ -172,6 +198,17 @@ const ResultsPage = ({route, navigation}) => {
         })
         .catch(function(error) {
             console.log('There has been a problem with your fetch operation: ' + error.message);
+        });
+    };
+
+    const addToFavorites = (translateValueRef, id) => {
+        Animated.timing(translateValueRef, {
+            toValue: 300,
+            duration: 500,
+            useNativeDriver: true,
+        }).start(() => {
+            // Reset CharacterInfo
+            setCharactersInfo(charactersInfo.filter((c) => c.id !== id));
         });
     };
 
@@ -186,9 +223,10 @@ const ResultsPage = ({route, navigation}) => {
             onPress={() => handleItemPress(item)}
             name={item.name ? item.name.toString() : 'None.'}
             image={item.image}
+            favoritePressCallback={addToFavorites}
+            id={item.id}
         />);
     };
-
 
 
     return (
@@ -312,8 +350,6 @@ const ResultsPage = ({route, navigation}) => {
                 data={charactersInfo}
                 onEndReachedThreshold={0.1}
                 onEndReached={fetchMoreData}
-                ListHeaderComponent={() =>
-                {<Text>No hay personajes cargados</Text>;}}
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
                 renderItem={renderCharacterCard}

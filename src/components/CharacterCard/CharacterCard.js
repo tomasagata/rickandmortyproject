@@ -1,15 +1,21 @@
-import React from 'react';
-import {Text, Pressable, View, Image} from 'react-native';
+import React, { useRef } from 'react';
+import {Text, Pressable, View, Image, Animated} from 'react-native';
 import characterCardStyles from './styles';
 
 const CharacterCard = props => {
+    const translateValueRef = useRef(new Animated.Value(0)).current;
     if ((props.name === undefined) || (props.image === undefined)){
         return ( <TimedOutCard /> );
     }
 
     return (
-        <View style={characterCardStyles.characterCardContainer}>
+        <Animated.View style={[characterCardStyles.characterCardContainer, {transform: [{translateX: translateValueRef}]}]}>
             <Pressable onPress={props.onPress} style={characterCardStyles.characterCardPressable }>
+                <View style={characterCardStyles.favoriteButtonContainer}>
+                    <Pressable style={characterCardStyles.favoriteButton} onPress={() => props.favoritePressCallback(translateValueRef, props.id)}>
+                        <Image style={characterCardStyles.favoriteImage} source={ require('../../../img/favorite_add.png') }/>
+                    </Pressable>
+                </View>
                 <View style={characterCardStyles.characterImageWrapper}>
                     <Image style={characterCardStyles.characterImage} source={{uri: props.image}}/>
                 </View>
@@ -19,7 +25,7 @@ const CharacterCard = props => {
                     </Text>
                 </View>
             </Pressable>
-        </View>
+        </Animated.View>
 
     );
 };
