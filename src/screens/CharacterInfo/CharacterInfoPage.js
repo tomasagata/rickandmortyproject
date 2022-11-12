@@ -1,10 +1,11 @@
 import React from 'react';
-import {View, Text, ScrollView, Pressable, Image} from 'react-native';
+import {View, Text, ScrollView, Pressable, Image, Animated} from 'react-native';
 import styles from './styles';
 import Section from '../../components/Sections/Sections';
 import database from '@react-native-firebase/database';
 import FavoriteAddImage from '../../../img/favorite_add.png';
 import FavoriteRemoveImage from '../../../img/favorite_remove.png';
+import favAnimation from '../../../img/favAnimation.png';
 
 
 
@@ -75,10 +76,27 @@ const CharacterInfoPage = ({route, navigation}) => {
         });
     }
 
+    const [visible,setVisible] = React.useState(false)
+    const [currentValue] = React.useState(new Animated.Value(1))
+    
     const addFavoriteStatus = () => {
         if (route.params === undefined) {
             return;
         }
+
+        setVisible(true)
+
+        //para que se prenda la animacion favAnimation
+        Animated.spring(currentValue,{toValue:2, friction:2, useNativeDriver:false}).start(()=> {
+            Animated.spring(currentValue,{
+                toValue:1,
+                useNativeDriver:false
+            }).start(()=> {
+                setVisible(false)
+            })
+        })
+
+
         // Push character and get key
         let data_key = database().ref('favorite_data').push(route.params).key;
 
@@ -96,6 +114,8 @@ const CharacterInfoPage = ({route, navigation}) => {
             database_id: data_key,
         });
     };
+
+    
 
     const removeFavoriteStatus = () => {
         database()
@@ -117,7 +137,29 @@ const CharacterInfoPage = ({route, navigation}) => {
     };
 
     return (
+        
         <View style={styles.viewport}>
+             {visible && <Animated.Image
+             
+                source={require('../../../img/favAnimation.png')}
+
+                style = {{
+                    position: "absolute",
+                    top:180,
+                    left:140,
+                    elevation:4,
+                    zIndex: 3,
+                    height: 50,
+                    width: 150,
+                    transform: [{scale:currentValue}]
+                                    
+                }}
+                name= "stars"
+                size={10}/>
+
+            }
+                
+            
             <Pressable style={styles.pressable} onPress={navigation.goBack}>
                 <Text style={styles.backButton}>X</Text>
             </Pressable>
