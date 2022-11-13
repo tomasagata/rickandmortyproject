@@ -23,6 +23,11 @@ const TaggedTextInput = props => {
 };
 
 
+const excludeCharacters = (characterArray, favoriteIdObjectArray) => {
+    let excludedIds = favoriteIdObjectArray.map(({character_id}) => character_id);
+    return characterArray.filter(({id}) => (excludedIds.includes(id) === false));
+};
+
 const ResultsPage = ({route, navigation}) => {
 
     const flatListRef = React.useRef(null);
@@ -49,10 +54,11 @@ const ResultsPage = ({route, navigation}) => {
         'genderless': selectButtons.unselectedPressable,
         'unknown': selectButtons.unselectedPressable,
     });
-    const [favoriteCharacterIds, setFavoriteCharacterIds] = React.useState([]);
+    const [favoriteIdObjects, setFavoriteIdObjects] = React.useState([]);
 
     React.useEffect(() => {
         let unsubscribe = navigation.addListener('focus', () => {
+            console.log('focus');
             getFavoriteCharacters();
         });
         return unsubscribe;
@@ -67,26 +73,24 @@ const ResultsPage = ({route, navigation}) => {
 
     React.useEffect(() => {
         updateCharacterList();
-    }, [favoriteCharacterIds]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [favoriteIdObjects]);
 
     const getFavoriteCharacters = () => {
         database().ref().child('favorite_ids').once('value').then((snapshot) => {
             var characters = snapshot.val();
             if (characters !== null) {
                 // There are characters in favorites
-                setFavoriteCharacterIds(Object.values(characters).map((c) => c.character_id));
+                setFavoriteIdObjects(Object.values(characters));
             } else {
                 // There are no characters available
-                setFavoriteCharacterIds([]);
+                setFavoriteIdObjects([]);
             }
         });
     };
 
     const updateCharacterList = () => {
-        let newShownCharacters = shownCharacters.filter((item) => {
-            return favoriteCharacterIds.includes(item.id) === false;
-        });
-        setShownCharacters(newShownCharacters);
+        setShownCharacters(excludeCharacters(shownCharacters, favoriteIdObjects));
     };
 
     const goToFavorites = () => {
@@ -161,7 +165,8 @@ const ResultsPage = ({route, navigation}) => {
         .then(res => {
             let results = res.results;
             if (results !== undefined) {
-                setShownCharacters(results);
+                let newShownCharacters = excludeCharacters(results, favoriteIdObjects);
+                setShownCharacters(newShownCharacters);
             }
             setOffset(2);
         })
@@ -186,7 +191,7 @@ const ResultsPage = ({route, navigation}) => {
         .then(res => {
             let results = res.results;
             if (results) {
-                let newShownCharacters = [...shownCharacters, ...results].filter((item) => favoriteCharacterIds.includes(item.id) === false);
+                let newShownCharacters = excludeCharacters([...shownCharacters, ...results], favoriteIdObjects);
                 setShownCharacters(newShownCharacters);
                 setOffset(offset + 1);
             }
@@ -220,6 +225,7 @@ const ResultsPage = ({route, navigation}) => {
             favoritePressCallback={addToFavorites}
             characterData={item}
             favoritePressAction={'add'}
+            favoriteId={undefined}
         />);
     };
 

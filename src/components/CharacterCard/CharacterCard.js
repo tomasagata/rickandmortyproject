@@ -5,48 +5,57 @@ import database from '@react-native-firebase/database';
 
 const CharacterCard = props => {
     const translateValueRef = useRef(new Animated.Value(0)).current;
-    const [favoriteIdObject, setFavoriteIdObject] = React.useState();
-    const [favoriteIdObjectKey, setFavoriteIdObjectKey] = React.useState();
+    const [favoriteIdObject, setFavoriteIdObject] = React.useState(props.favoriteId);
+
+
     if (props.characterData === undefined){
         return ( <TimedOutCard /> );
     }
 
     const addFavoriteStatus = () => {
+        if (props.characterData === undefined) {
+            return;
+        }
         // Push character and get key
         let data_key = database().ref('favorite_data').push(props.characterData).key;
 
-        // Use key to generate a 'light' favoriteIdObject with pointer to real data object
-        let id_object_key = database()
-        .ref('favorite_ids')
-        .push({
-            character_id: props.characterData.id,
-            database_id: data_key,
-        }).key;
+        // Get key to generate a 'light' favoriteIdObject with pointer to real data object
+        let id_object_key = database().ref('favorite_ids').push().key;
 
-        setFavoriteIdObjectKey(id_object_key);
-        setFavoriteIdObject({
+        // Create the object to be set
+        let favorite_id_object = {
+            object_id: id_object_key,
             character_id: props.characterData.id,
             database_id: data_key,
-        });
+        };
+
+        // Use key to set the real data
+        database().ref('favorite_ids').child(id_object_key).set(favorite_id_object);
+
+        // Update the state
+        setFavoriteIdObject(favorite_id_object);
     };
 
     const removeFavoriteStatus = () => {
+
+        // Borro el caracter completo de 'favorite_data'
         database()
         .ref('favorite_data')
         .child(favoriteIdObject.database_id)
         .set(null)
         .then(() => {
+            // Una vez terminado, borro el objeto ligero con su puntero de 'favorite_ids'
             database()
             .ref('favorite_ids')
-            .child(favoriteIdObjectKey)
+            .child(favoriteIdObject.object_id)
             .set(null)
             .then(() => {
                 console.log('Removed character id ' + props.characterData.id + ' from favorites');
             });
         });
 
+        // Actualizo el state
         setFavoriteIdObject(undefined);
-        setFavoriteIdObjectKey(undefined);
     };
 
     return (

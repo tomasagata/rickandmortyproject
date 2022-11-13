@@ -11,7 +11,6 @@ const SavedCharacters = ({route, navigation}) => {
     const [loading, setLoading] = React.useState(false);
     const [charactersInfo, setCharactersInfo] = React.useState([]);
 
-
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             getSavedCharacters();
@@ -26,16 +25,19 @@ const SavedCharacters = ({route, navigation}) => {
     const getSavedCharacters = () => {
         setLoading(true);
 
+        // Obtiene todos los datos de los favoritos
         database()
         .ref()
-        .child('favorite_data')
         .once('value')
         .then(
             (snapshot) => {
-                let characters = snapshot.val();
-                if (characters) {
-                    // There are characters in favorites
-                    setCharactersInfo(Object.values(characters));
+                let favoritesDatabase = snapshot.val();
+                if (favoritesDatabase) {
+                    // There are characters in favorites (Database is not empty)
+                    let characterData = Object.values(favoritesDatabase.favorite_data);
+                    let favoriteIds = Object.values(favoritesDatabase.favorite_ids);
+                    let newCharactersInfo = characterData.map((charData, i) => ({favorite_data: charData, favorite_id: favoriteIds[i]}));
+                    setCharactersInfo(newCharactersInfo);
                 } else {
                     // There are no characters available
                     setCharactersInfo([]);
@@ -59,7 +61,7 @@ const SavedCharacters = ({route, navigation}) => {
             duration: 500,
             useNativeDriver: true,
         }).start(() => {
-            setCharactersInfo(charactersInfo.filter((c) => c.id !== id));
+            setCharactersInfo(charactersInfo.filter((c) => c.favorite_data.id !== id));
         });
     };
 
@@ -71,10 +73,11 @@ const SavedCharacters = ({route, navigation}) => {
     const renderCharacterCard = ({item}) => {
         return (
         <CharacterCard
-            onPress={() => handleItemPress(item)}
-            characterData={item}
+            onPress={() => handleItemPress(item.favorite_data)}
+            characterData={item.favorite_data}
             favoritePressCallback={removeFromFavorites}
             favoritePressAction={'remove'}
+            favoriteId={item.favorite_id}
         />);
     };
 
