@@ -55,6 +55,10 @@ const CharacterInfoPage = ({route, navigation}) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [navigation]);
 
+    React.useEffect(() => {
+        console.log(commentData);
+    }, [commentData]);
+
     const getFavoriteIdObject = () => {
         database()
         .ref('favorite_ids')
@@ -163,10 +167,7 @@ const CharacterInfoPage = ({route, navigation}) => {
             comment_string: text,
         });
 
-        setCommentData([...commentData, {
-            character_id: route.params.id,
-            comment_string: text,
-        }]);
+        setCommentData([...commentData, text]);
     };
 
     return (

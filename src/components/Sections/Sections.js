@@ -65,7 +65,6 @@ const SectionTitleImage = ({source}) => {
 Section.TitleImage = SectionTitleImage;
 
 const SingleComment = (props) => {
-    console.log(props.children);
     return (
         <View style={styles.commentTextWrapper}>
             <Text style={styles.commentText}>{props.children}</Text>
@@ -75,10 +74,20 @@ const SingleComment = (props) => {
 
 const SectionComments = (props) => {
     const [editableComment, setEditableComment] = React.useState('');
+    const [comments, setComments] = React.useState(props.data);
     //props.data, props.submitCallback, props.isFavorite
 
-    const submit = () => {
-        props.submitCallback();
+    React.useEffect(() => {
+        console.log(props.data);
+        setComments(props.data);
+    }, [props.data]);
+
+    React.useEffect(() => {
+        console.log(comments);
+    }, [comments]);
+
+    const submit = (e) => {
+        props.submitCallback(e.nativeEvent.text);
         setEditableComment('');
     };
 
@@ -97,7 +106,7 @@ const SectionComments = (props) => {
                     onSubmitEditing={submit}
                     />
                 </View>
-                {props.data.map((comment_data, i) => <SingleComment key={i}>{comment_data.comment_string}</SingleComment>)}
+                {comments.map((comment_data, i) => <SingleComment key={i}>{comment_data}</SingleComment>)}
             </>
         );
     } else {
