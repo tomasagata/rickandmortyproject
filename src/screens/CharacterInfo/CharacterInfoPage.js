@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, ScrollView, Pressable, Image} from 'react-native';
+import {View, Text, ScrollView, Pressable, Image, Animated} from 'react-native';
 import styles from './styles';
 import Section from '../../components/Sections/Sections';
 import database from '@react-native-firebase/database';
@@ -33,6 +33,7 @@ const CharacterInfoPage = ({route, navigation}) => {
 
     const [episodeInfo, setEpisodeInfo] = React.useState('');
     const [favoriteIdObject, setFavoriteIdObject] = React.useState(undefined);
+    const [currentValue] = React.useState(new Animated.Value(1));
 
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
@@ -72,6 +73,19 @@ const CharacterInfoPage = ({route, navigation}) => {
         if (route.params === undefined) {
             return;
         }
+
+        // Do animation
+        Animated.spring(currentValue,{
+            toValue: 2,
+            friction: 2,
+            useNativeDriver:false,
+        }).start(()=> {
+            Animated.spring(currentValue,{
+                toValue:1,
+                useNativeDriver:false,
+            }).start();
+        });
+
         // Push character and get key
         let data_key = database().ref('favorite_data').push(route.params).key;
 
@@ -120,7 +134,7 @@ const CharacterInfoPage = ({route, navigation}) => {
                 <Text style={styles.backButton}>X</Text>
             </Pressable>
             <Pressable style={styles.addToFavoritesPressable} onPress={favoriteIdObject ? removeFavoriteStatus : addFavoriteStatus}>
-                <Image style={styles.addToFavoritesIcon} source={{ uri: (favoriteIdObject ? Image.resolveAssetSource(FavoriteRemoveImage).uri : Image.resolveAssetSource(FavoriteAddImage).uri) }} />
+                <Animated.Image style={[styles.addToFavoritesIcon, {transform: [{scale: currentValue}]}]} source={{ uri: (favoriteIdObject ? Image.resolveAssetSource(FavoriteRemoveImage).uri : Image.resolveAssetSource(FavoriteAddImage).uri) }} />
             </Pressable>
             <ScrollView contentContainerStyle={styles.scrollView}>
 
