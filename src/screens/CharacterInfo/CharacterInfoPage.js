@@ -19,6 +19,15 @@ import FavoriteRemoveImage from '../../../img/favorite_remove.png';
         database_id: Es el puntero al personaje completo en la base 'favorite_data'
         character_id: Es el id del personaje que estamos guardando
     }
+
+    Luego para los comentarios, hacemos uso de otro objeto liviano y varios pesados
+
+    comment_data:
+    {
+        character_id: Es el id del personaje a comentar
+        comment_string: String del comentario
+    }
+
 */
 
 
@@ -34,11 +43,13 @@ const CharacterInfoPage = ({route, navigation}) => {
     const [episodeInfo, setEpisodeInfo] = React.useState('');
     const [favoriteIdObject, setFavoriteIdObject] = React.useState(undefined);
     const [currentValue] = React.useState(new Animated.Value(1));
+    const [commentData, setCommentData] = React.useState([]);
 
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             getEpisode(route.params.episode[0]);
             getFavoriteIdObject();
+            getComments();
         });
         return unsubscribe;
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -59,7 +70,23 @@ const CharacterInfoPage = ({route, navigation}) => {
         });
     };
 
-
+    const getComments = () => {
+        database()
+        .ref('comment_data')
+        .once('value')
+        .then(snapshot => {
+            let results = snapshot.val();
+            if (results) {
+                let comments_arr = Object
+                                    .values(results)
+                                    .filter(({character_id}) => character_id === route.params.id)
+                                    .map(({comment_string}) => comment_string);
+                setCommentData(comments_arr);
+            } else {
+                setCommentData([]);
+            }
+        });
+    };
 
     function getEpisode(uriEpisode){
         fetch(uriEpisode)
@@ -128,6 +155,20 @@ const CharacterInfoPage = ({route, navigation}) => {
         setFavoriteIdObject(undefined);
     };
 
+    const submitComment = (text) => {
+        database()
+        .ref('comment_data')
+        .push({
+            character_id: route.params.id,
+            comment_string: text,
+        });
+
+        setCommentData([...commentData, {
+            character_id: route.params.id,
+            comment_string: text,
+        }]);
+    };
+
     return (
         <View style={styles.viewport}>
             <Pressable style={styles.pressable} onPress={navigation.goBack}>
@@ -191,6 +232,13 @@ const CharacterInfoPage = ({route, navigation}) => {
                         <Section.TaggedData.Tag>Episode</Section.TaggedData.Tag>
                         <Section.TaggedData.Data>{ episodeInfo ? episodeInfo.name.toString() : 'No hay episodio cargado' }</Section.TaggedData.Data>
                     </Section.TaggedData>
+                </Section>
+
+                <Section>
+                    <Section.Comments
+                    data={commentData}
+                    isFavorite={favoriteIdObject ? true : false}
+                    submitCallback={submitComment}/>
                 </Section>
             </ScrollView>
         </View>

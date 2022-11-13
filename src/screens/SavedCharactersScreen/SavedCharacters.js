@@ -27,7 +27,6 @@ const SavedCharacters = ({route, navigation}) => {
 
         // Obtiene todos los datos de los favoritos
         database()
-        .ref()
         .once('value')
         .then(
             (snapshot) => {
