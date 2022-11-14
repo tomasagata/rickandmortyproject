@@ -36,7 +36,7 @@ const commentsSlice = createSlice({
             })
             .addCase(fetchComments.fulfilled, (state, action) => {
                 if (action.payload !== null) {
-                    state.entities = action.payload;
+                    state.entities = Object.values(action.payload);
                 }
                 state.entities = [];
                 state.status = 'idle';
