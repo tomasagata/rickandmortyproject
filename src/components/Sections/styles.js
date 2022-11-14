@@ -100,10 +100,40 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         fontSize: 20,
     },
-    characterImage: { //*
+    characterImage: {
         resizeMode: 'contain',
         height: '100%',
         width: '100%',
+    },
+    commentTextWrapper: {
+        display: 'flex',
+        width: '90%',
+        height: 60,
+        borderRadius: 10,
+        backgroundColor: '#9A2E2E',
+        marginTop: 10,
+        marginBottom: 5,
+        justifyContent: 'center',
+        alignContent: 'flex-start',
+        paddingHorizontal: 10,
+        flexWrap: 'wrap',
+    },
+    editableTextWrapper: {
+        display: 'flex',
+        width: '90%',
+        height: 60,
+        borderRadius: 10,
+        backgroundColor: '#d46868',
+        marginTop: 10,
+        marginBottom: 5,
+        justifyContent: 'center',
+        alignContent: 'flex-start',
+        paddingHorizontal: 10,
+        flexWrap: 'wrap',
+    },
+    commentText: { //*
+        color: '#FFFFFF',
+        fontSize: 12,
     },
 });
 

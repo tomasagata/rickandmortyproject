@@ -1,7 +1,8 @@
-import { View, Text, Image, TextInput, Pressable, FlatList, Keyboard } from 'react-native';
+import { View, Text, Image, TextInput, Pressable, FlatList, Keyboard, Animated } from 'react-native';
 import React from 'react';
 import {styles, selectButtons} from './styles';
 import CharacterCard from '../../components/CharacterCard/CharacterCard';
+import database from '@react-native-firebase/database';
 
 
 const TaggedTextInput = props => {
@@ -22,6 +23,11 @@ const TaggedTextInput = props => {
 };
 
 
+const excludeCharacters = (characterArray, favoriteIdObjectArray) => {
+    let excludedIds = favoriteIdObjectArray.map(({character_id}) => character_id);
+    return characterArray.filter(({id}) => (excludedIds.includes(id) === false));
+};
+
 const ResultsPage = ({route, navigation}) => {
 
     const flatListRef = React.useRef(null);
@@ -35,7 +41,7 @@ const ResultsPage = ({route, navigation}) => {
     const [temporaryFilters, setTemporaryFilters] = React.useState(currentFilters);
     const [filterOptionsStyle, setFilterOptionsStyle] = React.useState(styles.hiddenFilterOptionsSection);
     const [loading, setLoading] = React.useState(false);
-    const [charactersInfo, setCharactersInfo] = React.useState([]);
+    const [shownCharacters, setShownCharacters] = React.useState([]);
     const [offset, setOffset] = React.useState(1);
     const [statusButtonsStyle, setStatusButtonsStyle] = React.useState({
         'alive': selectButtons.unselectedPressable,
@@ -48,13 +54,44 @@ const ResultsPage = ({route, navigation}) => {
         'genderless': selectButtons.unselectedPressable,
         'unknown': selectButtons.unselectedPressable,
     });
+    const [favoriteIdObjects, setFavoriteIdObjects] = React.useState([]);
+
+    React.useEffect(() => {
+        let unsubscribe = navigation.addListener('focus', () => {
+            console.log('focus');
+            getFavoriteCharacters();
+        });
+        return unsubscribe;
+    }, [navigation]);
 
 
-
+    // similar a un didComponentUpdate
     React.useEffect(() => {
         getCharacters('https://rickandmortyapi.com/api/character?page=' + offset);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    React.useEffect(() => {
+        updateCharacterList();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [favoriteIdObjects]);
+
+    const getFavoriteCharacters = () => {
+        database().ref().child('favorite_ids').once('value').then((snapshot) => {
+            var characters = snapshot.val();
+            if (characters !== null) {
+                // There are characters in favorites
+                setFavoriteIdObjects(Object.values(characters));
+            } else {
+                // There are no characters available
+                setFavoriteIdObjects([]);
+            }
+        });
+    };
+
+    const updateCharacterList = () => {
+        setShownCharacters(excludeCharacters(shownCharacters, favoriteIdObjects));
+    };
 
     const goToFavorites = () => {
         navigation.navigate('SavedCharacters');
@@ -123,21 +160,15 @@ const ResultsPage = ({route, navigation}) => {
 
     const getCharacters = (uriCharacter) => {
 
-        setLoading(true);
-
         fetch(uriCharacter)
-        .then(res => res.json()) /** una vez que el servidor responde, la respuesta se convierte en json */
+        .then(res => res.json())
         .then(res => {
-            // Preguntar si la query tiene resultados previene que se añadan datos invalidos
-            // al flatlist
-
-            setCharactersInfo(res.results);
+            let results = res.results;
+            if (results !== undefined) {
+                let newShownCharacters = excludeCharacters(results, favoriteIdObjects);
+                setShownCharacters(newShownCharacters);
+            }
             setOffset(2);
-
-            setLoading(false);
-            /**setLocationInfo(res.location)
-            setEpisodeInfo(res.episode)*/
-
         })
         .catch(function(error) {
             console.log('There has been a problem with your fetch operation: ' + error.message);
@@ -146,9 +177,6 @@ const ResultsPage = ({route, navigation}) => {
 
     const handleItemPress = (character) => {
         navigation.navigate('CharacterInfo', character);
-
-        // setACharacterInfo(character);
-        // setModalVisible(true);
     };
 
     const fetchMoreData = () => {
@@ -159,12 +187,12 @@ const ResultsPage = ({route, navigation}) => {
             '&status=' + currentFilters.status +
             '&species=' + currentFilters.species +
             '&gender=' + currentFilters.gender)
-        .then(res => res.json()) /** una vez que el servidor responde, la respuesta se convierte en json */
+        .then(res => res.json())
         .then(res => {
-            // Preguntar si la query tiene resultados previene que se añadan datos invalidos
-            // al flatlist
-            if (res.results) {
-                setCharactersInfo([...charactersInfo, ...res.results]);
+            let results = res.results;
+            if (results) {
+                let newShownCharacters = excludeCharacters([...shownCharacters, ...results], favoriteIdObjects);
+                setShownCharacters(newShownCharacters);
                 setOffset(offset + 1);
             }
 
@@ -172,6 +200,16 @@ const ResultsPage = ({route, navigation}) => {
         })
         .catch(function(error) {
             console.log('There has been a problem with your fetch operation: ' + error.message);
+        });
+    };
+
+    const addToFavorites = (translateValueRef, id) => {
+        Animated.timing(translateValueRef, {
+            toValue: 300,
+            duration: 500,
+            useNativeDriver: true,
+        }).start(() => {
+            setShownCharacters(shownCharacters.filter((c) => c.id !== id));
         });
     };
 
@@ -184,12 +222,12 @@ const ResultsPage = ({route, navigation}) => {
         return (
         <CharacterCard
             onPress={() => handleItemPress(item)}
-            name={item.name ? item.name.toString() : 'None.'}
-            image={item.image}
+            favoritePressCallback={addToFavorites}
+            characterData={item}
+            favoritePressAction={'add'}
+            favoriteId={undefined}
         />);
     };
-
-
 
     return (
 
@@ -309,11 +347,9 @@ const ResultsPage = ({route, navigation}) => {
             <FlatList
                 ref={flatListRef}
                 style={styles.flatList}
-                data={charactersInfo}
+                data={shownCharacters}
                 onEndReachedThreshold={0.1}
                 onEndReached={fetchMoreData}
-                ListHeaderComponent={() =>
-                {<Text>No hay personajes cargados</Text>;}}
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
                 renderItem={renderCharacterCard}

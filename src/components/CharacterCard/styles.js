@@ -81,6 +81,30 @@ const characterCardStyles = StyleSheet.create({
         fontSize: 15,
         textAlign: 'center',
     },
+    favoriteButtonContainer: {
+        position: 'absolute',
+        display: 'flex',
+        left: 0,
+        top: 0,
+        width: '30%',
+        height: undefined,
+        aspectRatio: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1,
+    },
+    favoriteButton: {
+        display: 'flex',
+        height: '100%',
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    favoriteImage: {
+        width: '100%',
+        height: '100%',
+        // backgroundColor: '#C13A3A',
+    },
 });
 
 export default characterCardStyles;
