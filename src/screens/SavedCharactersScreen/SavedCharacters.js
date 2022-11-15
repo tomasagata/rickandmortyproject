@@ -5,12 +5,12 @@ import CharacterCard from '../../components/CharacterCard/CharacterCard';
 import {useDispatch, useSelector, shallowEqual} from 'react-redux';
 import {
     fetchCompleteFavorites,
-    selectAllSavedData,
+    selectAllFavoriteCharacterData,
 } from '../../redux/reducers/favoriteCharacters';
 
 const SavedCharacters = ({route, navigation}) => {
     const flatListRef = React.useRef(null);
-    const charactersInfo = useSelector(selectAllSavedData, shallowEqual);
+    const charactersInfo = useSelector(selectAllFavoriteCharacterData, shallowEqual);
     const dispatch = useDispatch();
 
     React.useEffect(() => {
@@ -39,8 +39,8 @@ const SavedCharacters = ({route, navigation}) => {
     const renderCharacterCard = ({item}) => {
         return (
             <CharacterCard
-                onPress={() => handleItemPress(item.favorite_data)}
-                characterData={item.favorite_data}
+                onPress={() => handleItemPress(item)}
+                characterData={item}
             />
         );
     };

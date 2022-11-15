@@ -98,6 +98,10 @@ export const selectAllSavedData = state => {
     });
 };
 
+export const selectAllFavoriteCharacterData = state => {
+    return state.favoriteCharacters.data_entities;
+};
+
 const favoriteCharactersSlice = createSlice({
     name: 'favoriteCharacters',
     initialState,
