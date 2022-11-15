@@ -6,10 +6,10 @@ import episodesReducer from './reducers/episodes';
 
 const store = configureStore({
     reducer: {
-        apiCharacters: apiCharactersReducer,
         comments: commentsReducer,
         favoriteCharacters: favoriteCharactersReducer,
         episodes: episodesReducer,
+        apiCharacters: apiCharactersReducer,
     },
 });
 

@@ -11,7 +11,7 @@ import CharacterInfoPage from './src/screens/CharacterInfo/CharacterInfoPage';
 import SavedCharacters from './src/screens/SavedCharactersScreen/SavedCharacters';
 import firebase from '@react-native-firebase/app';
 import firebaseConfig from './.firebaseconfig';
-import Provider from 'react-redux';
+import { Provider } from 'react-redux';
 import store from './src/redux/store';
 
 const App = () => {

@@ -8,19 +8,24 @@ const initialState = {
 };
 
 
-const fetchComments = createAsyncThunk('comments/fetchComments', async () => {
+export const fetchComments = createAsyncThunk('comments/fetchComments', async () => {
     let snapshot = await database().ref('comment_data').once('value');
     return snapshot.val();
 });
 
 
-const pushComment = createAsyncThunk('comments/pushComment', async (queryObject) => {
+export const pushComment = createAsyncThunk('comments/pushComment', async (queryObject) => {
     let response = await database().ref('comment_data').push().set(queryObject);
     return {
         status: response,
         queryObject,
     };
 });
+
+
+export const selectCommentsByCharacterId = id => state => {
+    return state.comments.entities.filter(comment => comment.character_id === id);
+};
 
 
 const commentsSlice = createSlice({
@@ -37,8 +42,9 @@ const commentsSlice = createSlice({
             .addCase(fetchComments.fulfilled, (state, action) => {
                 if (action.payload !== null) {
                     state.entities = Object.values(action.payload);
+                } else {
+                    state.entities = [];
                 }
-                state.entities = [];
                 state.status = 'idle';
             })
             .addCase(pushComment.pending, (state, action) => {

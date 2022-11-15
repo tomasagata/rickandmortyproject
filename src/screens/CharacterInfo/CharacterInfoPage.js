@@ -2,9 +2,12 @@ import React from 'react';
 import {View, Text, ScrollView, Pressable, Image, Animated} from 'react-native';
 import styles from './styles';
 import Section from '../../components/Sections/Sections';
-import database from '@react-native-firebase/database';
 import FavoriteAddImage from '../../../img/favorite_add.png';
 import FavoriteRemoveImage from '../../../img/favorite_remove.png';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { fetchEpisode, selectEpisodeByURI } from '../../redux/reducers/episodes';
+import { fetchComments, pushComment, selectCommentsByCharacterId } from '../../redux/reducers/comments';
+import { addToFavorites, removeFromFavorites, selectFavoriteIdObjectByCharacterId } from '../../redux/reducers/favoriteCharacters';
 
 /*
     En nuestra base de datos, utilizamos un objeto mas ligero para hacer las queries mucho mas eficientes.
@@ -31,139 +34,65 @@ import FavoriteRemoveImage from '../../../img/favorite_remove.png';
 */
 
 
-function getKeyByCharacterId(object, value) {
-    return Object.keys(object).find(key => {
-        return (object[key].character_id === value);
-    });
-}
-
 
 const CharacterInfoPage = ({route, navigation}) => {
 
-    const [episodeInfo, setEpisodeInfo] = React.useState('');
-    const [favoriteIdObject, setFavoriteIdObject] = React.useState(undefined);
     const [currentValue] = React.useState(new Animated.Value(1));
-    const [commentData, setCommentData] = React.useState([]);
+    const dispatch = useDispatch();
+    const episodeInfo = useSelector(selectEpisodeByURI(route.params.episode[0]), shallowEqual);
+    const favoriteIdObject = useSelector(selectFavoriteIdObjectByCharacterId(route.params.id), shallowEqual);
+    const commentData = useSelector(selectCommentsByCharacterId(route.params.id), shallowEqual);
+
+    // React.useEffect(() => {
+    //     const unsubscribe = navigation.addListener('focus', () => {
+    //         dispatch(fetchEpisode(route.params.episode[0]));
+    //         dispatch(fetchComments());
+    //     });
+    //     return unsubscribe;
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [navigation]);
 
     React.useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', () => {
-            getEpisode(route.params.episode[0]);
-            getFavoriteIdObject();
-            getComments();
-        });
-        return unsubscribe;
+        dispatch(fetchEpisode(route.params.episode[0]));
+        dispatch(fetchComments());
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [navigation]);
+    }, []);
 
-    const getFavoriteIdObject = () => {
-        database()
-        .ref('favorite_ids')
-        .once('value')
-        .then(snapshot => {
-            let favorite_id_object_dict = snapshot.val();
-            if (favorite_id_object_dict) {
-                let favorite_id_object_key = getKeyByCharacterId(favorite_id_object_dict, route.params.id);
-                if (favorite_id_object_key){
-                    setFavoriteIdObject({...favorite_id_object_dict[favorite_id_object_key], object_id: favorite_id_object_key});
-                }
-            }
-        });
-    };
 
-    const getComments = () => {
-        database()
-        .ref('comment_data')
-        .once('value')
-        .then(snapshot => {
-            let results = snapshot.val();
-            if (results) {
-                let comments_arr = Object
-                                    .values(results)
-                                    .filter(({character_id}) => character_id === route.params.id)
-                                    .map(({comment_string}) => comment_string);
-                setCommentData(comments_arr);
-            } else {
-                setCommentData([]);
-            }
-        });
-    };
+    const favoriteButtonHandler = () => {
 
-    function getEpisode(uriEpisode){
-        fetch(uriEpisode)
-        .then(res => res.json())
-        .then(res => {
-            setEpisodeInfo(res);
-        });
-    }
+        // if there isn't a favoriteIdObject, object is not favorited
+        if (favoriteIdObject === undefined) {
 
-    const addFavoriteStatus = () => {
-        if (route.params === undefined) {
-            return;
+            // Add it to favorites
+            dispatch(addToFavorites({characterData: route.params}));
+
+            // Do animation
+            Animated.spring(currentValue,{
+                toValue: 2,
+                friction: 2,
+                useNativeDriver:false,
+            }).start(()=> {
+                Animated.spring(currentValue,{
+                    toValue:1,
+                    useNativeDriver:false,
+                }).start();
+            });
+        } else {
+
+            // Remove from favorites
+            dispatch(removeFromFavorites(favoriteIdObject));
         }
 
-        // Do animation
-        Animated.spring(currentValue,{
-            toValue: 2,
-            friction: 2,
-            useNativeDriver:false,
-        }).start(()=> {
-            Animated.spring(currentValue,{
-                toValue:1,
-                useNativeDriver:false,
-            }).start();
-        });
-
-        // Push character and get key
-        let data_key = database().ref('favorite_data').push(route.params).key;
-
-        // Get key to generate a 'light' favoriteIdObject with pointer to real data object
-        let id_object_key = database().ref('favorite_ids').push().key;
-
-        // Create the object to be set
-        let favorite_id_object = {
-            object_id: id_object_key,
-            character_id: route.params.id,
-            database_id: data_key,
-        };
-
-        // Use key to set the real data
-        database().ref('favorite_ids').child(id_object_key).set(favorite_id_object);
-
-        // Update the state
-        setFavoriteIdObject(favorite_id_object);
     };
 
-    const removeFavoriteStatus = () => {
-
-        // Borro el caracter completo de 'favorite_data'
-        database()
-        .ref('favorite_data')
-        .child(favoriteIdObject.database_id)
-        .set(null)
-        .then(() => {
-            // Una vez terminado, borro el objeto ligero con su puntero de 'favorite_ids'
-            database()
-            .ref('favorite_ids')
-            .child(favoriteIdObject.object_id)
-            .set(null)
-            .then(() => {
-                console.log('Removed character id ' + route.params.id + ' from favorites');
-            });
-        });
-
-        // Actualizo el state
-        setFavoriteIdObject(undefined);
-    };
-
-    const submitComment = (text) => {
-        database()
-        .ref('comment_data')
-        .push({
-            character_id: route.params.id,
-            comment_string: text,
-        });
-
-        setCommentData([...commentData, text]);
+    const commentSubmitHandler = (text) => {
+        dispatch(
+            pushComment({
+                character_id: route.params.id,
+                comment_string: text,
+            })
+        );
     };
 
     return (
@@ -171,7 +100,7 @@ const CharacterInfoPage = ({route, navigation}) => {
             <Pressable style={styles.pressable} onPress={navigation.goBack}>
                 <Text style={styles.backButton}>X</Text>
             </Pressable>
-            <Pressable style={styles.addToFavoritesPressable} onPress={favoriteIdObject ? removeFavoriteStatus : addFavoriteStatus}>
+            <Pressable style={styles.addToFavoritesPressable} onPress={favoriteButtonHandler}>
                 <Animated.Image style={[styles.addToFavoritesIcon, {transform: [{scale: currentValue}]}]} source={{ uri: (favoriteIdObject ? Image.resolveAssetSource(FavoriteRemoveImage).uri : Image.resolveAssetSource(FavoriteAddImage).uri) }} />
             </Pressable>
             <ScrollView contentContainerStyle={styles.scrollView}>
@@ -227,7 +156,7 @@ const CharacterInfoPage = ({route, navigation}) => {
                     <Section.Subtitle>First Seen In</Section.Subtitle>
                     <Section.TaggedData>
                         <Section.TaggedData.Tag>Episode</Section.TaggedData.Tag>
-                        <Section.TaggedData.Data>{ episodeInfo ? episodeInfo.name.toString() : 'No hay episodio cargado' }</Section.TaggedData.Data>
+                        <Section.TaggedData.Data>{ episodeInfo.name ?? 'No hay episodio cargado' }</Section.TaggedData.Data>
                     </Section.TaggedData>
                 </Section>
 
@@ -235,7 +164,7 @@ const CharacterInfoPage = ({route, navigation}) => {
                     <Section.Comments
                     data={commentData}
                     isFavorite={favoriteIdObject ? true : false}
-                    submitCallback={submitComment}/>
+                    submitCallback={commentSubmitHandler}/>
                 </Section>
             </ScrollView>
         </View>

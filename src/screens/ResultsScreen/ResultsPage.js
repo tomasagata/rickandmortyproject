@@ -1,8 +1,11 @@
-import { View, Text, Image, TextInput, Pressable, FlatList, Keyboard, Animated } from 'react-native';
+import { View, Text, Image, TextInput, Pressable, FlatList, Keyboard } from 'react-native';
 import React from 'react';
 import {styles, selectButtons} from './styles';
 import CharacterCard from '../../components/CharacterCard/CharacterCard';
-import database from '@react-native-firebase/database';
+import { shallowEqual, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { selectShownCharacters, fetchAPICharacters, fetchMoreCharacters } from '../../redux/reducers/apiCharacters';
+import { fetchCompleteFavorites } from '../../redux/reducers/favoriteCharacters';
 
 
 const TaggedTextInput = props => {
@@ -23,11 +26,6 @@ const TaggedTextInput = props => {
 };
 
 
-const excludeCharacters = (characterArray, favoriteIdObjectArray) => {
-    let excludedIds = favoriteIdObjectArray.map(({character_id}) => character_id);
-    return characterArray.filter(({id}) => (excludedIds.includes(id) === false));
-};
-
 const ResultsPage = ({route, navigation}) => {
 
     const flatListRef = React.useRef(null);
@@ -40,9 +38,7 @@ const ResultsPage = ({route, navigation}) => {
     });
     const [temporaryFilters, setTemporaryFilters] = React.useState(currentFilters);
     const [filterOptionsStyle, setFilterOptionsStyle] = React.useState(styles.hiddenFilterOptionsSection);
-    const [loading, setLoading] = React.useState(false);
-    const [shownCharacters, setShownCharacters] = React.useState([]);
-    const [offset, setOffset] = React.useState(1);
+    const shownCharacters = useSelector(selectShownCharacters, shallowEqual);
     const [statusButtonsStyle, setStatusButtonsStyle] = React.useState({
         'alive': selectButtons.unselectedPressable,
         'dead': selectButtons.unselectedPressable,
@@ -54,44 +50,28 @@ const ResultsPage = ({route, navigation}) => {
         'genderless': selectButtons.unselectedPressable,
         'unknown': selectButtons.unselectedPressable,
     });
-    const [favoriteIdObjects, setFavoriteIdObjects] = React.useState([]);
+
+    const dispatch = useDispatch();
 
     React.useEffect(() => {
         let unsubscribe = navigation.addListener('focus', () => {
-            console.log('focus');
-            getFavoriteCharacters();
+            dispatch(fetchCompleteFavorites());
         });
         return unsubscribe;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [navigation]);
-
 
     // similar a un didComponentUpdate
     React.useEffect(() => {
-        getCharacters('https://rickandmortyapi.com/api/character?page=' + offset);
+        dispatch(fetchAPICharacters({
+            species: currentFilters.species,
+            type: currentFilters.type,
+            name: currentFilters.name,
+            status: currentFilters.status,
+            gender: currentFilters.gender,
+        }));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    React.useEffect(() => {
-        updateCharacterList();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [favoriteIdObjects]);
-
-    const getFavoriteCharacters = () => {
-        database().ref().child('favorite_ids').once('value').then((snapshot) => {
-            var characters = snapshot.val();
-            if (characters !== null) {
-                // There are characters in favorites
-                setFavoriteIdObjects(Object.values(characters));
-            } else {
-                // There are no characters available
-                setFavoriteIdObjects([]);
-            }
-        });
-    };
-
-    const updateCharacterList = () => {
-        setShownCharacters(excludeCharacters(shownCharacters, favoriteIdObjects));
-    };
 
     const goToFavorites = () => {
         navigation.navigate('SavedCharacters');
@@ -143,36 +123,17 @@ const ResultsPage = ({route, navigation}) => {
     };
 
     const applyFilter = () => {
-        setOffset(1);
 
-        getCharacters(
-            'https://rickandmortyapi.com/api/character/?page=1' +
-            '&name=' + temporaryFilters.name +
-            '&type=' + temporaryFilters.type +
-            '&status=' + temporaryFilters.status +
-            '&species=' + temporaryFilters.species +
-            '&gender=' + temporaryFilters.gender
-        );
+        dispatch(fetchAPICharacters({
+            name: temporaryFilters.name,
+            type: temporaryFilters.type,
+            status: temporaryFilters.status,
+            species: temporaryFilters.species,
+            gender: temporaryFilters.gender,
+        }));
         Keyboard.dismiss();
         setFilterOptionsStyle(styles.hiddenFilterOptionsSection);
         setCurrentFilters(temporaryFilters);
-    };
-
-    const getCharacters = (uriCharacter) => {
-
-        fetch(uriCharacter)
-        .then(res => res.json())
-        .then(res => {
-            let results = res.results;
-            if (results !== undefined) {
-                let newShownCharacters = excludeCharacters(results, favoriteIdObjects);
-                setShownCharacters(newShownCharacters);
-            }
-            setOffset(2);
-        })
-        .catch(function(error) {
-            console.log('There has been a problem with your fetch operation: ' + error.message);
-        });
     };
 
     const handleItemPress = (character) => {
@@ -180,37 +141,13 @@ const ResultsPage = ({route, navigation}) => {
     };
 
     const fetchMoreData = () => {
-        fetch(
-            'https://rickandmortyapi.com/api/character/?' +
-            'page=' + offset +
-            '&name=' + currentFilters.name +
-            '&status=' + currentFilters.status +
-            '&species=' + currentFilters.species +
-            '&gender=' + currentFilters.gender)
-        .then(res => res.json())
-        .then(res => {
-            let results = res.results;
-            if (results) {
-                let newShownCharacters = excludeCharacters([...shownCharacters, ...results], favoriteIdObjects);
-                setShownCharacters(newShownCharacters);
-                setOffset(offset + 1);
-            }
-
-            setLoading(false);
-        })
-        .catch(function(error) {
-            console.log('There has been a problem with your fetch operation: ' + error.message);
-        });
-    };
-
-    const addToFavorites = (translateValueRef, id) => {
-        Animated.timing(translateValueRef, {
-            toValue: 300,
-            duration: 500,
-            useNativeDriver: true,
-        }).start(() => {
-            setShownCharacters(shownCharacters.filter((c) => c.id !== id));
-        });
+        dispatch(fetchMoreCharacters({
+            name: currentFilters.name,
+            type: currentFilters.type,
+            status: currentFilters.status,
+            species: currentFilters.species,
+            gender: currentFilters.gender,
+        }));
     };
 
     // Siguiendo las recomendaciones de reactnative.dev/docs,
@@ -222,10 +159,7 @@ const ResultsPage = ({route, navigation}) => {
         return (
         <CharacterCard
             onPress={() => handleItemPress(item)}
-            favoritePressCallback={addToFavorites}
             characterData={item}
-            favoritePressAction={'add'}
-            favoriteId={undefined}
         />);
     };
 
@@ -353,7 +287,6 @@ const ResultsPage = ({route, navigation}) => {
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
                 renderItem={renderCharacterCard}
-                refreshing={loading}
             />
         </View>
     </View>

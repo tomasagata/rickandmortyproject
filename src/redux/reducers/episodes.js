@@ -7,10 +7,15 @@ const initialState = {
 };
 
 
-const fetchEpisode = createAsyncThunk('episodes/fetchEpisode', async uriEpisode => {
+export const fetchEpisode = createAsyncThunk('episodes/fetchEpisode', async uriEpisode => {
     let response = await fetch(uriEpisode).then(res => res.json());
     return response;
 });
+
+
+export const selectEpisodeByURI = episodeURI => state => {
+    return state.episodes.entities.filter(ep => ep.url === episodeURI);
+};
 
 
 const episodesSlice = createSlice({
@@ -25,7 +30,7 @@ const episodesSlice = createSlice({
                 state.status = 'loading';
             })
             .addCase(fetchEpisode.fulfilled, (state, action) => {
-                if (action.payload.error !== undefined) {
+                if (action.payload.error === undefined) {
                     state.entities = [...state.entities, action.payload];
                 }
                 state.status = 'idle';

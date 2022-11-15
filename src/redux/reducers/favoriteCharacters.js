@@ -1,6 +1,5 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import database from '@react-native-firebase/database';
-
 
 const initialState = {
     data_entities: [],
@@ -8,34 +7,45 @@ const initialState = {
     status: null,
 };
 
+export const fetchFavoritesIds = createAsyncThunk(
+    'favoriteCharacters/fetchFavoritesIds',
+    async (arg, thunkAPI) => {
+        return (await database().ref('favorite_ids').once('value')).val();
+    },
+);
 
-const fetchFavoritesIds = createAsyncThunk('favoriteCharacters/fetchFavoritesIds', async (arg, thunkAPI) => {
-    return (await database().ref('favorite_ids').once('value')).val();
-});
+export const fetchFavoritesData = createAsyncThunk(
+    'favoriteCharacters/fetchFavoritesData',
+    async (arg, thunkAPI) => {
+        return (await database().ref('favorite_data').once('value')).val();
+    },
+);
 
+export const fetchCompleteFavorites = createAsyncThunk(
+    'favoriteCharacters/fetchCompleteFavorites',
+    async (arg, thunkAPI) => {
+        let favorite_ids = (
+            await database().ref('favorite_ids').once('value')
+        ).val();
+        let favorite_data = (
+            await database().ref('favorite_data').once('value')
+        ).val();
+        return {
+            favorite_ids,
+            favorite_data,
+        };
+    },
+);
 
-const fetchFavoritesData = createAsyncThunk('favoriteCharacters/fetchFavoritesData', async (arg, thunkAPI) => {
-    return (await database().ref('favorite_data').once('value')).val();
-});
-
-const fetchCompleteFavorites = createAsyncThunk('favoriteCharacters/fetchCompleteFavorites', async (arg, thunkAPI) => {
-    let favorite_ids =  (await database().ref('favorite_ids').once('value')).val();
-    let favorite_data =  (await database().ref('favorite_data').once('value')).val();
-
-    return {
-        favorite_ids,
-        favorite_data,
-    };
-});
-
-
-const addToFavorites = createAsyncThunk('favoriteCharacters/addToFavorites', async (arg, thunkAPI) => {
-
+export const addToFavorites = createAsyncThunk('favoriteCharacters/addToFavorites', async (arg, thunkAPI) => {
     // Push empty and get key
     let data_key = database().ref('favorite_data').push().key;
 
     // Wait for data to set
-    let char_data_response = await database().ref('favorite_data').child(data_key).set(arg.characterData);
+    await database()
+        .ref('favorite_data')
+        .child(data_key)
+        .set(arg.characterData);
 
     // Get key to generate a 'light' favoriteIdObject with pointer to real data object
     let id_object_key = database().ref('favorite_ids').push().key;
@@ -48,34 +58,50 @@ const addToFavorites = createAsyncThunk('favoriteCharacters/addToFavorites', asy
     };
 
     // Use id key to set the real data
-    let char_id_response = await database().ref('favorite_ids').child(id_object_key).set(favorite_id_object);
-
-    console.log('added to favorites');
+    await database()
+        .ref('favorite_ids')
+        .child(id_object_key)
+        .set(favorite_id_object);
 
     return {
-        char_data_response,
-        char_id_response,
+        id_entity: favorite_id_object,
+        data_entity: arg.characterData,
     };
 });
 
+export const removeFromFavorites = createAsyncThunk('favoriteCharacters/removeFromFavorites', async (arg, thunkAPI) => {
+        await database().ref('favorite_data').child(arg.database_id).set(null);
+        await database().ref('favorite_ids').child(arg.object_id).set(null);
+        return arg;
+    },
+);
 
-const removeFromFavorites = createAsyncThunk('favoriteCharacters/removeFromFavorites', async (arg, thunkAPI) => {
-    let char_data_response = await database().ref('favorite_data').child(arg.database_id).set(null);
-    let char_id_response = await database().ref('favorite_data').child(arg.object_id).set(null);
-    console.log('Removed character id ' + arg.character_id + ' from favorites');
-    return {
-        char_data_response,
-        char_id_response,
-    };
-});
+export const selectFavoriteIdObjects = state => {
+    return state.favoriteCharacters.id_entities;
+};
 
+export const selectFavoriteIdObjectByCharacterId = id => state => {
+    return state.favoriteCharacters.id_entities.filter(
+        id_obj => id_obj.character_id === id
+    )[0];
+};
+
+export const selectAllSavedData = state => {
+    return state.favoriteCharacters.id_entities.map(id_ent => {
+        let pairing_entity = state.favoriteCharacters.data_entities.filter(
+            data_ent => data_ent.id === id_ent.character_id,
+        )[0];
+        return {
+            favorite_data: pairing_entity,
+            favorite_id: id_ent,
+        };
+    });
+};
 
 const favoriteCharactersSlice = createSlice({
     name: 'favoriteCharacters',
     initialState,
-    reducers: {
-
-    },
+    reducers: {},
     extraReducers: builder => {
         builder
             .addCase(fetchFavoritesIds.pending, (state, action) => {
@@ -104,9 +130,16 @@ const favoriteCharactersSlice = createSlice({
                 state.status = 'loading';
             })
             .addCase(fetchCompleteFavorites.fulfilled, (state, action) => {
-                if (action.payload.favorite_ids !== null && action.payload.favorite_data !== null) {
-                    state.id_entities = Object.values(action.payload.favorite_ids);
-                    state.data_entities = Object.values(action.payload.favorite_data);
+                if (
+                    action.payload.favorite_ids !== null &&
+                    action.payload.favorite_data !== null
+                ) {
+                    state.id_entities = Object.values(
+                        action.payload.favorite_ids,
+                    );
+                    state.data_entities = Object.values(
+                        action.payload.favorite_data,
+                    );
                 } else {
                     state.id_entities = [];
                     state.data_entities = [];
@@ -117,12 +150,16 @@ const favoriteCharactersSlice = createSlice({
                 state.status = 'loading';
             })
             .addCase(addToFavorites.fulfilled, (state, action) => {
+                state.id_entities = [...state.id_entities, action.payload.id_entity];
+                state.data_entities = [...state.data_entities, action.payload.data_entity];
                 state.status = 'idle';
             })
             .addCase(removeFromFavorites.pending, (state, action) => {
                 state.status = 'loading';
             })
             .addCase(removeFromFavorites.fulfilled, (state, action) => {
+                state.id_entities = state.id_entities.filter(id_ent => id_ent.character_id !== action.payload.character_id);
+                state.data_entities = state.data_entities.filter(data_ent => data_ent.id !== action.payload.character_id);
                 state.status = 'idle';
             });
     },
