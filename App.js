@@ -11,6 +11,8 @@ import CharacterInfoPage from './src/screens/CharacterInfo/CharacterInfoPage';
 import SavedCharacters from './src/screens/SavedCharactersScreen/SavedCharacters';
 import firebase from '@react-native-firebase/app';
 import firebaseConfig from './.firebaseconfig';
+import { Provider } from 'react-redux';
+import store from './src/redux/store';
 
 const App = () => {
 
@@ -21,13 +23,15 @@ const App = () => {
     const Stack = createNativeStackNavigator();
 
     return (
-        <NavigationContainer>
-            <Stack.Navigator initialRouteName="Results" screenOptions={{headerShown: false}}>
-                <Stack.Screen name="Results" component={ResultsPage} />
-                <Stack.Screen name="CharacterInfo" component={CharacterInfoPage} />
-                <Stack.Screen name="SavedCharacters" component={SavedCharacters} />
-            </Stack.Navigator>
-        </NavigationContainer>
+        <Provider store={store}>
+            <NavigationContainer>
+                <Stack.Navigator initialRouteName="Results" screenOptions={{headerShown: false}}>
+                    <Stack.Screen name="Results" component={ResultsPage} />
+                    <Stack.Screen name="CharacterInfo" component={CharacterInfoPage} />
+                    <Stack.Screen name="SavedCharacters" component={SavedCharacters} />
+                </Stack.Navigator>
+            </NavigationContainer>
+        </Provider>
     );
 };
 

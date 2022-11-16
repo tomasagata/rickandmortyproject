@@ -106,7 +106,7 @@ const SectionComments = (props) => {
                     onSubmitEditing={submit}
                     />
                 </View>
-                {comments.map((comment_data, i) => <SingleComment key={i}>{comment_data}</SingleComment>)}
+                {comments.map((comment_data, i) => <SingleComment key={i}>{comment_data.comment_string}</SingleComment>)}
             </>
         );
     } else {
