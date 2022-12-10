@@ -14,7 +14,7 @@ export const fetchEpisode = createAsyncThunk('episodes/fetchEpisode', async uriE
 
 
 export const selectEpisodeByURI = episodeURI => state => {
-    return state.episodes.entities.filter(ep => ep.url === episodeURI);
+    return state.episodes.entities.filter(ep => ep.url === episodeURI)[0];
 };
 
 

@@ -156,7 +156,7 @@ const CharacterInfoPage = ({route, navigation}) => {
                     <Section.Subtitle>First Seen In</Section.Subtitle>
                     <Section.TaggedData>
                         <Section.TaggedData.Tag>Episode</Section.TaggedData.Tag>
-                        <Section.TaggedData.Data>{ episodeInfo.name ?? 'No hay episodio cargado' }</Section.TaggedData.Data>
+                        <Section.TaggedData.Data>{ episodeInfo?.name ?? 'No hay episodio cargado' }</Section.TaggedData.Data>
                     </Section.TaggedData>
                 </Section>
 
