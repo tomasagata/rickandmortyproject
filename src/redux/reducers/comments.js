@@ -15,10 +15,12 @@ export const fetchComments = createAsyncThunk('comments/fetchComments', async ()
 
 
 export const pushComment = createAsyncThunk('comments/pushComment', async (queryObject) => {
-    let response = await database().ref('comment_data').push().set(queryObject);
+    let comment_key = database().ref('comment_data').push().key;
+    let comment_with_id = {...queryObject, comment_id: comment_key};
+    let response = await database().ref('comment_data').child(comment_key).set(comment_with_id);
     return {
         status: response,
-        queryObject,
+        data: comment_with_id,
     };
 });
 
@@ -52,7 +54,7 @@ const commentsSlice = createSlice({
             })
             .addCase(pushComment.fulfilled, (state, action) => {
                 if (action.payload.status === null) { //Se cargó bien
-                    state.entities = [...state.entities, action.payload.queryObject];
+                    state.entities = [...state.entities, action.payload.data];
                 }
                 state.status = 'idle';
             });

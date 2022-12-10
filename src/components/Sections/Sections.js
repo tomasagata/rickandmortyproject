@@ -75,16 +75,10 @@ const SingleComment = (props) => {
 const SectionComments = (props) => {
     const [editableComment, setEditableComment] = React.useState('');
     const [comments, setComments] = React.useState(props.data);
-    //props.data, props.submitCallback, props.isFavorite
 
     React.useEffect(() => {
-        console.log(props.data);
         setComments(props.data);
     }, [props.data]);
-
-    React.useEffect(() => {
-        console.log(comments);
-    }, [comments]);
 
     const submit = (e) => {
         props.submitCallback(e.nativeEvent.text);
@@ -106,7 +100,7 @@ const SectionComments = (props) => {
                     onSubmitEditing={submit}
                     />
                 </View>
-                {comments.map((comment_data, i) => <SingleComment key={i}>{comment_data.comment_string}</SingleComment>)}
+                {comments.map((comment_data) => <SingleComment key={comment_data.comment_id}>{comment_data.comment_string}</SingleComment>)}
             </>
         );
     } else {

@@ -19,6 +19,7 @@ const App = () => {
     if (!firebase.apps.length){
         firebase.initializeApp(firebaseConfig);
     }
+    firebase.database().setPersistenceEnabled(true);
 
     const Stack = createNativeStackNavigator();
 
