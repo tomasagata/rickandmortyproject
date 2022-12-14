@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#C13A3A',
+        backgroundColor: '#265ADE',
         justifyContent: 'space-between',
         width: '100%',
         padding: '2%',
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         height: 50,
-        width: 150,
+        width: 105,
     },
     filterButtonWrapper: {
         display: 'flex',
@@ -217,8 +217,19 @@ const styles = StyleSheet.create({
     flatListContent: {
         display: 'flex',
         justifyContent: 'space-around',
-        alignItems: 'center',
         width: '100%',
+    },
+    favoriteItemView: {
+        width: '100%',
+        height: 50,
+        display: 'flex',
+        alignItems: 'center',
+        flexDirection: 'row',
+    },
+    historyItemText: {
+        color: '#000000',
+        display: 'flex',
+        alignItems: 'center',
     },
 });
 

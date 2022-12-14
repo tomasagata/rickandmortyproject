@@ -77,6 +77,10 @@ const ResultsPage = ({route, navigation}) => {
         navigation.navigate('SavedCharacters');
     };
 
+    const goToHistory = () => {
+        navigation.navigate('HistoryScreen');
+    };
+
     const setStatus = (value) => {
         let unSelectedStyle = {
             'alive': selectButtons.unselectedPressable,
@@ -264,6 +268,11 @@ const ResultsPage = ({route, navigation}) => {
                 <Text style={styles.resultText}>Results</Text>
             </View>
             <View style={styles.headerButtonsWrapper}>
+                <View style={styles.favoritesButtonWrapper}>
+                    <Pressable onPress={goToHistory} style={styles.favoritesButton}>
+                        <Image style={styles.favoritesButtonImage} source={require('../../../img/favorites.png')}/>
+                    </Pressable>
+                </View>
                 <View style={styles.favoritesButtonWrapper}>
                     <Pressable onPress={goToFavorites} style={styles.favoritesButton}>
                         <Image style={styles.favoritesButtonImage} source={require('../../../img/favorites.png')}/>

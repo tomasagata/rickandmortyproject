@@ -8,6 +8,7 @@ import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { fetchEpisode, selectEpisodeByURI } from '../../redux/reducers/episodes';
 import { fetchComments, pushComment, selectCommentsByCharacterId } from '../../redux/reducers/comments';
 import { addToFavorites, removeFromFavorites, selectFavoriteIdObjectByCharacterId } from '../../redux/reducers/favoriteCharacters';
+import { addHistoryItem } from '../../redux/reducers/history';
 
 /*
     En nuestra base de datos, utilizamos un objeto mas ligero para hacer las queries mucho mas eficientes.
@@ -66,6 +67,11 @@ const CharacterInfoPage = ({route, navigation}) => {
 
             // Add it to favorites
             dispatch(addToFavorites({characterData: route.params}));
+            dispatch(addHistoryItem({
+                character_id: route.params.id,
+                extraData: '',
+                action: 'favorites remove',
+            }));
 
             // Do animation
             Animated.spring(currentValue,{
@@ -82,6 +88,11 @@ const CharacterInfoPage = ({route, navigation}) => {
 
             // Remove from favorites
             dispatch(removeFromFavorites(favoriteIdObject));
+            dispatch(addHistoryItem({
+                character_id: favoriteIdObject.character_id,
+                extraData: '',
+                action: 'favorites remove',
+            }));
         }
 
     };
@@ -91,6 +102,13 @@ const CharacterInfoPage = ({route, navigation}) => {
             pushComment({
                 character_id: route.params.id,
                 comment_string: text,
+            })
+        );
+        dispatch(
+            addHistoryItem({
+                character_id: route.params.id,
+                extraData: text,
+                action: 'added comment',
             })
         );
     };

@@ -13,6 +13,7 @@ import firebase from '@react-native-firebase/app';
 import firebaseConfig from './.firebaseconfig';
 import { Provider } from 'react-redux';
 import store from './src/redux/store';
+import HistoryScreen from './src/screens/historial/historialScreen';
 
 const App = () => {
 
@@ -30,6 +31,7 @@ const App = () => {
                     <Stack.Screen name="Results" component={ResultsPage} />
                     <Stack.Screen name="CharacterInfo" component={CharacterInfoPage} />
                     <Stack.Screen name="SavedCharacters" component={SavedCharacters} />
+                    <Stack.Screen name="HistoryScreen" component={HistoryScreen} />
                 </Stack.Navigator>
             </NavigationContainer>
         </Provider>

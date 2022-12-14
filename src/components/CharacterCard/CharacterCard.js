@@ -3,6 +3,7 @@ import {Text, Pressable, View, Image, Animated} from 'react-native';
 import characterCardStyles from './styles';
 import { addToFavorites, removeFromFavorites, selectFavoriteIdObjectByCharacterId } from '../../redux/reducers/favoriteCharacters';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { addHistoryItem } from '../../redux/reducers/history';
 
 const CharacterCard = props => {
     const translateValueRef = useRef(new Animated.Value(0)).current;
@@ -27,6 +28,11 @@ const CharacterCard = props => {
 
             // Add it to favorites
             dispatch(addToFavorites({characterData: props.characterData}));
+            dispatch(addHistoryItem({
+                character_id: props.characterData.id,
+                action: 'favorite add',
+                extraData: '',
+            }));
         } else {
 
             Animated.timing(translateValueRef, {
@@ -37,6 +43,11 @@ const CharacterCard = props => {
 
             // Remove from favorites
             dispatch(removeFromFavorites(favoriteIdObject));
+            dispatch(addHistoryItem({
+                character_id: favoriteIdObject.character_id,
+                action: 'favorite remove',
+                extraData: '',
+            }));
         }
 
     };
