@@ -14,6 +14,7 @@ import firebaseConfig from './.firebaseconfig';
 import { Provider } from 'react-redux';
 import store from './src/redux/store';
 import HistoryScreen from './src/screens/historial/historialScreen';
+import MiScreen from './src/screens/MiNuevaScreen';
 
 const App = () => {
 
@@ -21,7 +22,6 @@ const App = () => {
         firebase.initializeApp(firebaseConfig);
     }
     firebase.database().setPersistenceEnabled(true);
-
     const Stack = createNativeStackNavigator();
 
     return (
@@ -32,6 +32,7 @@ const App = () => {
                     <Stack.Screen name="CharacterInfo" component={CharacterInfoPage} />
                     <Stack.Screen name="SavedCharacters" component={SavedCharacters} />
                     <Stack.Screen name="HistoryScreen" component={HistoryScreen} />
+                    <Stack.Screen name="JAJA" component={MiScreen}/>
                 </Stack.Navigator>
             </NavigationContainer>
         </Provider>

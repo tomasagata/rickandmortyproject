@@ -21,7 +21,7 @@ const CharacterCard = props => {
         if (favoriteIdObject === undefined) {
 
             Animated.timing(translateValueRef, {
-                toValue: 300,
+                toValue: 400,
                 duration: 200,
                 useNativeDriver: true,
             }).start();
@@ -36,7 +36,7 @@ const CharacterCard = props => {
         } else {
 
             Animated.timing(translateValueRef, {
-                toValue: -300,
+                toValue: -400,
                 duration: 200,
                 useNativeDriver: true,
             }).start();

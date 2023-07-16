@@ -60,8 +60,8 @@ const HistoryScreen = ({route, navigation}) => {
             </View>
             <FlatList
             data={historyData}
-            renderItem={({item}) => {
-                return (<HistoryItem key={item.history_id} extraData={item.extraData} character_id={item.character_id} action={item.action}/>);}
+            renderItem={({item, index}) => {
+                return (<HistoryItem key={item.history_id + index} extraData={item.extraData} character_id={item.character_id} action={item.action}/>);}
             }
             style={styles.flatList}
             contentContainerStyle={styles.flatListContent}

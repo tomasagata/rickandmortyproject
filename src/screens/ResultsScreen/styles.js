@@ -212,12 +212,11 @@ const styles = StyleSheet.create({
     },
     flatList: {
         display: 'flex',
-        width: '75%',
+        width: '100%',
     },
     flatListContent: {
         display: 'flex',
-        justifyContent: 'space-around',
-        alignItems: 'center',
+        padding: 50,
         width: '100%',
     },
 });

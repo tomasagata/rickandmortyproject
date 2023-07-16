@@ -1,4 +1,4 @@
-import { View, Text, Image, TextInput, Pressable, FlatList, Keyboard } from 'react-native';
+import { View, Text, Image, TextInput, Pressable, FlatList, Keyboard, Animated } from 'react-native';
 import React from 'react';
 import {styles, selectButtons} from './styles';
 import CharacterCard from '../../components/CharacterCard/CharacterCard';
@@ -39,6 +39,7 @@ const ResultsPage = ({route, navigation}) => {
     const [temporaryFilters, setTemporaryFilters] = React.useState(currentFilters);
     const [filterOptionsStyle, setFilterOptionsStyle] = React.useState(styles.hiddenFilterOptionsSection);
     const shownCharacters = useSelector(selectShownCharacters, shallowEqual);
+    const filterOptionsPosition = React.useRef(new Animated.Value(-10)).current;
     const [statusButtonsStyle, setStatusButtonsStyle] = React.useState({
         'alive': selectButtons.unselectedPressable,
         'dead': selectButtons.unselectedPressable,
@@ -117,11 +118,22 @@ const ResultsPage = ({route, navigation}) => {
 
     const showFilterOptions = () => {
         setFilterOptionsStyle(styles.shownFilterOptionsSection);
+        Animated.timing(filterOptionsPosition, {
+            toValue: 0,
+            duration: 600,
+            useNativeDriver: false,
+          }).start();
     };
 
     const cancelFilter = () => {
         Keyboard.dismiss();
+        console.log("anda")
         setFilterOptionsStyle(styles.hiddenFilterOptionsSection);
+        Animated.timing(filterOptionsPosition, {
+            toValue: -600,
+            duration: 600,
+            useNativeDriver: false,
+          }).start();
 
         setTemporaryFilters(currentFilters);
     };
@@ -170,7 +182,7 @@ const ResultsPage = ({route, navigation}) => {
     return (
 
     <View style={styles.viewport}>
-        <View style={filterOptionsStyle}>
+        <Animated.View style={{...filterOptionsStyle, top: filterOptionsPosition}} >
             <View style={styles.formContainer}>
                 <View style={styles.filterFormContainer}>
 
@@ -261,7 +273,7 @@ const ResultsPage = ({route, navigation}) => {
             <View style={styles.flagImageContainer}>
                 <Image style={styles.flagImage} source={require('../../../img/flagEnd.png')} />
             </View>
-        </View>
+        </Animated.View>
 
         <View style={styles.headerSection}>
             <View style={styles.resultTextWrapper}>
@@ -290,6 +302,7 @@ const ResultsPage = ({route, navigation}) => {
             <FlatList
                 ref={flatListRef}
                 style={styles.flatList}
+                contentContainerStyle={styles.flatListContent}
                 data={shownCharacters}
                 onEndReachedThreshold={0.1}
                 onEndReached={fetchMoreData}
