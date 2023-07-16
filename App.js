@@ -4,7 +4,7 @@
 // import MainPage from './src/MainPage';
 // import CharacterInfoPage from './src/CharacterInfoPage';
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';//import
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ResultsPage from './src/screens/ResultsScreen/ResultsPage';
 import CharacterInfoPage from './src/screens/CharacterInfo/CharacterInfoPage';
@@ -15,6 +15,7 @@ import { Provider } from 'react-redux';
 import store from './src/redux/store';
 import HistoryScreen from './src/screens/historial/historialScreen';
 import MiScreen from './src/screens/MiNuevaScreen';
+
 
 const App = () => {
 
