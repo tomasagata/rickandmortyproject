@@ -6,7 +6,7 @@ import FavoriteAddImage from '../../../img/favorite_add.png';
 import FavoriteRemoveImage from '../../../img/favorite_remove.png';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { fetchEpisode, selectEpisodeByURI } from '../../redux/reducers/episodes';
-import { fetchComments, pushComment, selectCommentsByCharacterId } from '../../redux/reducers/comments';
+import { fetchComments, pushComment, selectCommentsByCharacterId , editComment, removeComment} from '../../redux/reducers/comments';
 import { addToFavorites, removeFromFavorites, selectFavoriteIdObjectByCharacterId } from '../../redux/reducers/favoriteCharacters';
 import { addHistoryItem } from '../../redux/reducers/history';
 
@@ -113,6 +113,36 @@ const CharacterInfoPage = ({route, navigation}) => {
         );
     };
 
+    const commentEditHandler = (text, commentId) => {
+        dispatch(
+            editComment({
+                comment_id: commentId,
+                comment_string: text,
+            })
+        );
+        dispatch(
+            addHistoryItem({
+                character_id: route.params.id,
+                extraData: text,
+                action: 'edited comment',
+            })
+        );
+    };
+
+    const commentRemoveHandler = (commentId) => {
+        dispatch(
+            removeComment({
+                comment_id: commentId,
+            })
+        );
+        dispatch(
+            addHistoryItem({
+                character_id: route.params.id,
+                action: 'remove comment',
+            })
+        );
+    };
+
     return (
         <View style={styles.viewport}>
             <Pressable style={styles.pressable} onPress={navigation.goBack}>
@@ -182,7 +212,10 @@ const CharacterInfoPage = ({route, navigation}) => {
                     <Section.Comments
                     data={commentData}
                     isFavorite={favoriteIdObject ? true : false}
-                    submitCallback={commentSubmitHandler}/>
+                    submitCallback={commentSubmitHandler}
+                    editCallback={commentEditHandler}
+                    removeCallback={commentRemoveHandler}/>
+
                 </Section>
             </ScrollView>
         </View>

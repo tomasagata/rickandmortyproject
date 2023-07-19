@@ -39,7 +39,7 @@ const ResultsPage = ({route, navigation}) => {
     const [temporaryFilters, setTemporaryFilters] = React.useState(currentFilters);
     const [filterOptionsStyle, setFilterOptionsStyle] = React.useState(styles.hiddenFilterOptionsSection);
     const shownCharacters = useSelector(selectShownCharacters, shallowEqual);
-    const filterOptionsPosition = React.useRef(new Animated.Value(-10)).current;
+    const filterOptionsPosition = React.useRef(new Animated.Value(-600)).current;
     const [statusButtonsStyle, setStatusButtonsStyle] = React.useState({
         'alive': selectButtons.unselectedPressable,
         'dead': selectButtons.unselectedPressable,
@@ -139,7 +139,11 @@ const ResultsPage = ({route, navigation}) => {
     };
 
     const applyFilter = () => {
-
+        Animated.timing(filterOptionsPosition, {
+            toValue: -600,
+            duration: 600,
+            useNativeDriver: false,
+          }).start()
         dispatch(fetchAPICharacters({
             name: temporaryFilters.name,
             type: temporaryFilters.type,
@@ -280,7 +284,7 @@ const ResultsPage = ({route, navigation}) => {
                 <Text style={styles.resultText}>Results</Text>
             </View>
             <View style={styles.headerButtonsWrapper}>
-                <View style={styles.favoritesButtonWrapper}>
+                <View style={styles.HistoryButtonWrapper}>
                     <Pressable onPress={goToHistory} style={styles.favoritesButton}>
                         <Image style={styles.favoritesButtonImage} source={require('../../../img/favorites.png')}/>
                     </Pressable>

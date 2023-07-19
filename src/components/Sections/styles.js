@@ -2,6 +2,14 @@ import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
     // sections
+    commentButtonEdit: {
+        backgroundColor: '#f44336', /* Green */
+        borderRadius: '16px',
+        color: 'white',
+        padding: '15px 32px',
+        textAlign: 'center'
+
+    },
     section: { //*
         width: '90%',
         marginTop: 5,

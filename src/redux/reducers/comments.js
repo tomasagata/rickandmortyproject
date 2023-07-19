@@ -24,6 +24,16 @@ export const pushComment = createAsyncThunk('comments/pushComment', async (query
     };
 });
 
+export const editComment = createAsyncThunk('comments/editComment', async (queryObject) => {
+    let comment_key = await database().ref(`comment_data/${queryObject.comment_id}`).update({
+        comment_string: queryObject.comment_string
+    })
+});
+
+export const removeComment = createAsyncThunk('comments/removeComment', async (queryObject) => {
+    let comment_key = await database().ref(`comment_data/${queryObject.comment_id}`).remove()
+});
+
 
 export const selectCommentsByCharacterId = id => state => {
     return state.comments.entities.filter(comment => comment.character_id === id);

@@ -82,6 +82,16 @@ const styles = StyleSheet.create({
         width: undefined,
         aspectRatio: 1,
     },
+
+    HistoryButtonWrapper: {
+        display: 'none',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 5,
+        width: 50,
+        height: '100%',
+    },
+
     favoritesButtonWrapper: {
         display: 'flex',
         justifyContent: 'center',
